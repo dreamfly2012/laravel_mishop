@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Http\Controllers\admin;
+namespace App\Http\Controllers\Admin;
 
-use App\Cate;
+use App\Models\Cate;
 use Illuminate\Http\Request;
 
 
@@ -10,7 +10,6 @@ use App\Http\Requests;
 use App\Http\Controllers\Controller;
 
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Input;
 
 class CateController extends Controller
 {
@@ -80,9 +79,9 @@ class CateController extends Controller
         $cate = Cate::where('id',$request->only('id'))->first();
 
         //判断用户名
-        if($cate['name'] != $request->name) {
+        if($cate['name'] != $request->input('name')) {
 
-            if(Cate::where('name','like', $request->name)->first()){
+            if(Cate::where('name','like', $request->input('name'))->first()){
 
                 return back()->with('error','类名已存在');
 

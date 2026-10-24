@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Controllers\admin;
+namespace App\Http\Controllers\Admin;
 
 
-use App\Cate;
-use App\Good;
-use App\Sku;
+use App\Models\Cate;
+use App\Models\Good;
+use App\Models\Sku;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
@@ -49,9 +49,9 @@ class SkuController extends Controller
         $data = $request->only('title','good_id');
        
         if(Sku::where('title',$data['title'])->get()->count()){
-            echo Sku::where('good_id',$data['good_id'])->count();
+            return response((string)Sku::where('good_id',$data['good_id'])->count());
         }else{
-            echo '0';
+            return response('0');
         }
     }
     public function postInsert(Request $request)
@@ -69,9 +69,9 @@ class SkuController extends Controller
         $sku->stock = $data['stock'];
         $sku->status = 1;
 
-        if($_FILES['img']['error']==0)
+        if($request->hasFile('img'))
         {
-            $sku->img = self::uploadFile();
+            $sku->img = $this->uploadFile($request);
 
         }else{
             $sku->img = config('app.upload_image_dir').'sku.png';
@@ -82,20 +82,21 @@ class SkuController extends Controller
 
 
 
-    public static function uploadFile()
+        private function uploadFile(Request $request, string $field = 'img'): string
     {
-        $pic = $_FILES['img']['name'];
+        $file = $request->file($field);
         $dir = config('app.upload_image_dir');
-        $name = trim($dir.rand(1000000,9000000).time().'.'.pathinfo($pic,4),'.');
-        Input::file('img')->move($dir,$name);
+        $name = $dir . rand(1000000, 9000000) . time() . '.' . strtolower($file->getClientOriginalExtension());
+        $file->move(public_path($dir), basename($name));
         return $name;
     }
+
     
     public function getAjaxEdit(Request $request)
     {
         $data = $request->only('title');
         $sku = Sku::where('title',$data['title'])->first();
-        echo json_encode($sku);
+        return response()->json($sku);
     }
 
     public function postUpdate(Request $request)
@@ -122,9 +123,9 @@ class SkuController extends Controller
         $sku->stock = $data['stock'];
         $sku->status = 1;
         
-        if($_FILES){
-            self::updateFile();
-            $sku->img = self::uploadFile();
+        if($request->hasFile('img')){
+            $this->deleteImage($sku->img, 'sku.png');
+            $sku->img = $this->uploadFile($request);
         }
 
         $sku -> save();
@@ -132,24 +133,19 @@ class SkuController extends Controller
         return back()->with('info','更新成功');
     }
 
-    public static function updateFile()
+        //删除旧图片文件(与默认占位图相同的跳过)
+    private function deleteImage(?string $img, string $default): void
     {
-        $pic = Sku::select('img')->where('id',Input::only('id'))->first();
-
-        $dbpic = '.'.$pic['img'];
-
-        $defaultpic = config('app.upload_image_dir').'good.png';
-
-        if($dbpic != $defaultpic)
-        {
-
-            if(file_exists(realpath($dbpic))){
-                unlink(realpath($dbpic));
-            }
-                
-          
+        $dir = config('app.upload_image_dir');
+        if (!$img || $img == $dir . $default) {
+            return;
+        }
+        $full = public_path($img);
+        if (is_file($full)) {
+            @unlink($full);
         }
     }
+
 
     public function getAjaxDelete(Request $request)
     {
@@ -158,9 +154,9 @@ class SkuController extends Controller
         $data = $request->only('title','good_id');
 
         if(Sku::where('title',$data['title'])->delete()){
-            echo Sku::where('good_id',$data['good_id'])->count();
+            return response((string)Sku::where('good_id',$data['good_id'])->count());
         }else{
-            echo '0';
+            return response('0');
         }
     }
     public function getDelete(Request $request)

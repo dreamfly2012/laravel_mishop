@@ -7,8 +7,8 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use DB;
-use App\Navigation;
-use App\Sku;
+use App\Models\Navigation;
+use App\Models\Sku;
 
 class IndexController extends Controller
 {
@@ -55,9 +55,9 @@ class IndexController extends Controller
         $nav = Navigation::find($request->input('id'));
         $nav->status = $request->input('status');
         if($nav->save()){
-            echo 0;die;
+            return response('0');
         }else{
-            echo 1;die;
+            return response('1');
         }
     }
     /**
@@ -122,8 +122,7 @@ class IndexController extends Controller
      */
     public function getAjaxcreate()
     {
-        $navs = Navigation::where('status',1)->get();
-        $data = [];
+        $navs = Navigation::where('status',1)->get();        $data = [];
         foreach($navs as $k=>$v)
         {
             $temp = [];
@@ -135,9 +134,8 @@ class IndexController extends Controller
         $str = json_encode($data);
         $str = 'var navData = '.$str;
 
-        if(!file_put_contents('./data/indexNav.js',$str)){
-            echo 0;
-            die;
+        if(!file_put_contents(public_path('data/indexNav.js'),$str)){
+            return response('0');
         }
 
         return $str;
@@ -179,8 +177,8 @@ class IndexController extends Controller
      */
     public function getStaradd(Request $request)
     {
-        if(file_exists('./data/stargoods.json')){
-            $data = file_get_contents('./data/stargoods.json');
+        if(file_exists(public_path('data/stargoods.json'))){
+            $data = file_get_contents(public_path('data/stargoods.json'));
 
             $data = json_decode($data);
             if(!empty($data)){
@@ -215,7 +213,7 @@ class IndexController extends Controller
             $data[] = $temp;
         }
 
-        if(file_put_contents('./data/stargoods.json',json_encode($data))){
+        if(file_put_contents(public_path('data/stargoods.json'),json_encode($data))){
             return back()->with('info','添加成功');
         }else{
             return back()->with('error','添加失败');
@@ -279,10 +277,10 @@ class IndexController extends Controller
         
         $dataStr = json_encode($data);
         $dataStr = 'var cate = '.$dataStr.';';
-        if(file_put_contents('./data/indexData.js',$dataStr)){
-            echo 1;die;
+        if(file_put_contents(public_path('data/indexData.js'),$dataStr)){
+            return response('1');
         }else{
-            echo 0;die;
+            return response('0');
         }
     }
 }

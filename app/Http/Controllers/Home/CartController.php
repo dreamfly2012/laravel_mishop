@@ -6,9 +6,9 @@ use Illuminate\Http\Request;
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
-use App\Cart;
-use App\Good;
-use App\Sku;
+use App\Models\Cart;
+use App\Models\Good;
+use App\Models\Sku;
 
 class CartController extends Controller
 {
@@ -24,12 +24,6 @@ class CartController extends Controller
         session(['uid'=>null]);
         session(['cart'=>null]);
         session(['listItem'=>null]);
-    }
-    public function getSe(){
-        dd(session()->all());
-    }
-    public function getLg(){
-        session(['uid'=>3]);
     }
     public function index()
     {
@@ -61,14 +55,12 @@ class CartController extends Controller
                         $info->goods_attr = $sku->color;
                         $info->goods_num = $v[1];
                         if(!$info->save()){
-                            echo '数据库出错';
-                            die;
+                            return response('数据库出错', 500);
                         }
                     }else{
                         $cart->goods_num = $cart->goods_num + (int)($v[1]);
                         if(!$cart->save()){
-                            echo '数据库出错';
-                            die;
+                            return response('数据库出错', 500);
                         }
                     }
                 }
@@ -95,7 +87,7 @@ class CartController extends Controller
             //判断购物车session中是否存在信息
             $carts = [];
 
-            if(count(session('cart'))>0){
+            if(count(session('cart') ?? [])>0){
                 //查询商品的信息                
                 foreach(session('cart') as $k=>$v){
                     $sku = Sku::where('id',$v[0])->first();
@@ -158,8 +150,7 @@ class CartController extends Controller
             $this->data['total'] = $sku->price;//价格小计
             $this->data['price'] = $sku->price;//当前价格
             $this->data['stock'] = $sku->stock;//当前价格
-            echo json_encode($this->data);
-            die;
+            return response()->json($this->data);
         }
         //判断是否是未登录状态
         if(empty($uid)){
@@ -172,7 +163,7 @@ class CartController extends Controller
             $request->session()->push('cart.'.($sku->id), $sku->good_id);//2 代表 gid good_id
            
             //保存数据更改            
-            \Session::save();
+            \session()->save();
             
                 
             //判断 该商品是否被选中 选中就更新总价
@@ -181,13 +172,13 @@ class CartController extends Controller
             $alltotal = 0;
             if($skus&&in_array($request->input('id'),$skus)){
                 
-                $this->totalPriceBySession($skus,$alltotal,$sku,$request);
+                return $this->totalPriceBySession($skus,$alltotal,$sku,$request);
 
             }else if(empty($request->input('listItem'))){//未全选状态处理
                 $this->data['nofollow'] = 'none';
                 $this->data['alltotal'] = number_format(0,2);
             }else{
-                $this->totalPriceBySession($skus,$alltotal,$sku,$request);
+                return $this->totalPriceBySession($skus,$alltotal,$sku,$request);
             }
 
                 //成功返回的信息
@@ -195,8 +186,7 @@ class CartController extends Controller
                 $this->data['total'] = number_format($sku->price*$request->input('num'),2);//价格小计
                 $this->data['price'] = number_format($sku->price,2);//当前价格
                 $this->data['msg'] = 'ok';
-                echo json_encode($this->data); 
-                die;
+                return response()->json($this->data);
            
         }
 
@@ -210,29 +200,27 @@ class CartController extends Controller
             $alltotal = 0;
             if($skus&&in_array($request->input('id'),$skus)){
                 //计算总价
-                $this->totalPriceByDB($uid,$skus,$alltotal,$sku,$cart,$request);
+                return $this->totalPriceByDB($uid,$skus,$alltotal,$sku,$cart,$request);
 
             }else if(empty($request->input('listItem'))){//未全选状态处理
                 $this->data['nofollow'] = 'none';;
                 $this->data['alltotal'] = number_format(0,2);
             }else{
                 //计算总价
-                $this->totalPriceByDB($uid,$skus,$alltotal,$sku,$cart,$request);
+                return $this->totalPriceByDB($uid,$skus,$alltotal,$sku,$cart,$request);
             }
 
             $this->data['status'] = 0;
             $this->data['total'] = number_format($sku->price*$request->input('num'),2);//价格小计
             $this->data['price'] = number_format($sku->price,2);//当前价格
             $this->data['msg'] = 'ok';
-            echo json_encode($this->data); 
-            die;
+            return response()->json($this->data);
         }else{
             $this->data['status'] = 4;
             $this->data['price'] = number_format($sku->price,2);//当前价格
             $this->data['total'] = number_format($sku->price*$cart->goods_num,2);//价格小计
             $this->data['msg'] = '数据库出错';
-            echo json_encode($this->data); 
-            die;
+            return response()->json($this->data);
         }
 
     }
@@ -256,8 +244,7 @@ class CartController extends Controller
                 $this->data['msg'] = '查不到商品信息';
                 $this->data['price'] = $sku->price;//当前价格单价
                 $this->data['total'] = $sku->price*$request->input('num');
-                echo json_encode($this->data);
-                die;
+                return response()->json($this->data);
             }
             
         }
@@ -269,16 +256,14 @@ class CartController extends Controller
             $this->data['price'] = number_format($sku->price,2);//当前价格
             $this->data['total'] = number_format($sku->price*$request->input('num'),2);//价格小计
             $this->data['alltotal'] = number_format($alltotal,2);
-            echo json_encode($this->data);
-            die;
+            return response()->json($this->data);
         }else{
             $this->data['status'] = 3;
             $this->data['msg'] = '未知错误';
             $this->data['price'] = number_format($sku->price,2);//当前价格
             $this->data['total'] = number_format($sku->price*$request->input('num'),2);//价格小计
             $this->data['alltotal'] = '未知错误,请刷新页面';
-            echo json_encode($this->data);
-            die;
+            return response()->json($this->data);
         }
     }
 
@@ -297,8 +282,7 @@ class CartController extends Controller
                 $this->data['msg'] = '查不到商品信息';
                 $this->data['price'] = number_format($sku->price,2);//当前价格单价
                 $this->data['total'] = number_format($sku->price*$request->input('num'),2);
-                echo json_encode($this->data);
-                die;
+                return response()->json($this->data);
             }
             
         }
@@ -309,16 +293,14 @@ class CartController extends Controller
             $this->data['price'] = number_format($cart->sku->price,2);//当前价格
             $this->data['total'] = number_format($sku->price*$request->input('num'),2);//价格小计
             $this->data['alltotal'] = number_format($alltotal,2);
-            echo json_encode($this->data);
-            die;
+            return response()->json($this->data);
         }else{
             $this->data['status'] = 3;
             $this->data['msg'] = '未知错误';
             $this->data['price'] = number_format($cart->sku->price,2);//当前价格
             $this->data['total'] = number_format($sku->price*$request->input('num'),2);//价格小计
             $this->data['alltotal'] = '未知错误,请刷新页面';
-            echo json_encode($this->data);
-            die;
+            return response()->json($this->data);
         }
 
     }
@@ -341,8 +323,7 @@ class CartController extends Controller
                 }else{
                     $this->data['status'] = 2;
                     $this->data['msg'] = '查不到商品信息';
-                    echo json_encode($this->data);
-                    die;
+                    return response()->json($this->data);
                 }
                 
             }
@@ -354,16 +335,14 @@ class CartController extends Controller
                 $this->data['price'] = number_format($sku->price,2);//当前价格
                 $this->data['total'] = number_format($sku->price*$request->input('num'),2);//价格小计
                 $this->data['alltotal'] = number_format($alltotal,2);
-                echo json_encode($this->data);
-                die;
+                return response()->json($this->data);
             }else{
                 $this->data['status'] = 3;
                 $this->data['msg'] = '未知错误';
                 $this->data['price'] = number_format($sku->price,2);//当前价格
                 $this->data['total'] = number_format($sku->price*$request->input('num'),2);//价格小计
                 $this->data['alltotal'] = '未知错误,请刷新页面';
-                echo json_encode($this->data);
-                die;
+                return response()->json($this->data);
             }
         }
         //登录状态下查询
@@ -376,8 +355,7 @@ class CartController extends Controller
                 $this->data['msg'] = '查不到商品信息';
                 $this->data['price'] = number_format($sku->price,2);//当前价格单价
                 $this->data['total'] = number_format($sku->price*$request->input('num'),2);
-                echo json_encode($this->data);
-                die;
+                return response()->json($this->data);
             }
             
         }
@@ -388,16 +366,14 @@ class CartController extends Controller
             $this->data['price'] = number_format($cart->sku->price,2);//当前价格
             $this->data['total'] = number_format($sku->price*$request->input('num'),2);//价格小计
             $this->data['alltotal'] = number_format($alltotal,2);
-            echo json_encode($this->data);
-            die;
+            return response()->json($this->data);
         }else{
             $this->data['status'] = 3;
             $this->data['msg'] = '未知错误';
             $this->data['price'] = number_format($cart->sku->price,2);//当前价格
             $this->data['total'] = number_format($sku->price*$request->input('num'),2);//价格小计
             $this->data['alltotal'] = '未知错误,请刷新页面';
-            echo json_encode($this->data);
-            die;
+            return response()->json($this->data);
         }
 
     }
@@ -422,12 +398,11 @@ class CartController extends Controller
 
             $request->session()->forget('cart.'.$request->input('id'));
             // session(['cart'.$request->input('id')=>null]);
-            \Session::save();
+            \session()->save();
             $this->data['status'] = 0;
             $this->data['msg'] = 'ok';
             $this->data['alltotal'] = $alltotal;
-            echo json_encode($this->data);
-            die;
+            return response()->json($this->data);
         }
 
         // $skuid = $request->input('id');
@@ -437,20 +412,17 @@ class CartController extends Controller
         if(empty($cart)){
             $this->data['status'] = 1;
             $this->data['msg'] = '查无该产品';
-            echo json_encode($this->data);
-            die;
+            return response()->json($this->data);
         }
         if($cart->delete()){
             $this->data['status'] = 0;
             $this->data['msg'] = 'ok';
             $this->data['alltotal'] = $alltotal;
-            echo json_encode($this->data);
-            die;
+            return response()->json($this->data);
         }else{
             $this->data['status'] = 2;
             $this->data['msg'] = '删除失败';
-            echo json_encode($this->data);
-            die;
+            return response()->json($this->data);
         }
     }
 
@@ -472,12 +444,10 @@ class CartController extends Controller
                 $request->session()->push('cart.'.($sku->id), $request->input('num'));//1 代表 num
                 $request->session()->push('cart.'.($sku->id), $sku->good_id);//2 代表 gid good_id
                 //保存修改过的session值
-                \Session()->save();
+                session()->save();
                 $this->data['status'] = 0;
                 $this->data['msg'] = 'ok';
-                echo json_encode($this->data);
-//                die;
-
+                return response()->json($this->data);
             }else{
 //                dd(444);
                 //修改session值
@@ -488,14 +458,13 @@ class CartController extends Controller
                 $request->session()->push('cart.'.($sku->id), $sku->good_id);
                 
                 //保存修改过的session值
-                \Session()->save();
+                session()->save();
                 $this->data['status'] = 0;
                 $this->data['msg'] = 'ok';
-                echo json_encode($this->data);
-//                die;
+                return response()->json($this->data);
 
             }
-            
+
 
         }
 
@@ -519,28 +488,24 @@ class CartController extends Controller
                 if($info->save()){
                     $this->data['status'] = 0;
                     $this->data['msg'] = 'ok';
-                    echo json_encode($this->data);
-                    die;
+                    return response()->json($this->data);
                 }else{
                     $this->data['status'] = 1;
                     $this->data['msg'] = '操作失败,请重试';
-                    echo json_encode($this->data);
-                    die;
+                    return response()->json($this->data);
                 }
 
             }else{
 
-                $cart->goods_num = $cart->goods_num + (int)($sku->$request->input('num'));
+                $cart->goods_num = $cart->goods_num + (int)$request->input('num');
                 if($cart->save()){
                     $this->data['status'] = 0;
                     $this->data['msg'] = 'ok';
-                    echo json_encode($this->data);
-                    die;
+                    return response()->json($this->data);
                 }else{
                     $this->data['status'] = 1;
                     $this->data['msg'] = '操作失败,请重试';
-                    echo json_encode($this->data);
-                    die;
+                    return response()->json($this->data);
                 }
             }
 

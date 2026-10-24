@@ -6,12 +6,12 @@ use Illuminate\Http\Request;
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
-use App\Order;
-use App\User;
-use App\Comment;
-use App\Good;
-use App\Sku;
-use App\Address;
+use App\Models\Order;
+use App\Models\User;
+use App\Models\Comment;
+use App\Models\Good;
+use App\Models\Sku;
+use App\Models\Address;
 
 class UserController extends Controller
 {

@@ -6,8 +6,8 @@ use Illuminate\Http\Request;
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
-use App\HelpArticle;
-use App\HelpCate;
+use App\Models\HelpArticle;
+use App\Models\HelpCate;
 
 class HelpController extends Controller
 {

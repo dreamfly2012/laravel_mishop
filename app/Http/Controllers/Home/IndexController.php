@@ -7,9 +7,9 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use DB;
-use App\Cate;
-use App\Good;
-use App\Sku;
+use App\Models\Cate;
+use App\Models\Good;
+use App\Models\Sku;
 class IndexController extends Controller
 {
     public function index()
@@ -17,10 +17,9 @@ class IndexController extends Controller
         
         //获取明星产品信息
         $star = null;
-        if(file_exists('./data/stargoods.json')){
-            $star = file_get_contents('./data/stargoods.json');
-
-            $star = json_decode($star);
+        $starFile = public_path('data/stargoods.json');
+        if(file_exists($starFile)){
+            $star = json_decode(file_get_contents($starFile));
         }
         $smarty = $this->allGoods(1);
         // dd($smarty);

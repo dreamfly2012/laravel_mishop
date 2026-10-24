@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Controllers\admin;
+namespace App\Http\Controllers\Admin;
 
 
-use App\Cate;
-use App\Good;
+use App\Models\Cate;
+use App\Models\Good;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
@@ -40,16 +40,16 @@ class GoodsController extends Controller
         $good->cate_id = $data['cate_id'];
         $good->price = $data['price'];
         $good->status = 1;
-        if($_FILES['showImg']['error']==0)
+        if($request->hasFile('showImg'))
         {
-            $good->showImg = self::uploadFile();
+            $good->showImg = $this->uploadFile($request, 'showImg');
 
         }else{
             $good->showImg = config('app.upload_image_dir').'good.png';
         }
-        if($_FILES['img']['error'][0]==0)
+        if($request->file('img'))
         {
-            $good->img = self::uploadFiles();
+            $good->img = $this->uploadFiles($request);
         }
 
         $good->content = $data['content'];
@@ -62,29 +62,31 @@ class GoodsController extends Controller
         }
     }
 
-    public static function uploadFile()
+        private function uploadFile(Request $request, string $field): string
     {
-        $pic = $_FILES['showImg']['name'];
+        $file = $request->file($field);
         $dir = config('app.upload_image_dir');
-        $name = trim($dir.rand(1000000,9000000).time().'.'.pathinfo($pic,4),'.');
-        Input::file('showImg')->move($dir,$name);
+        $name = $dir . rand(1000000, 9000000) . time() . '.' . strtolower($file->getClientOriginalExtension());
+        $file->move(public_path($dir), basename($name));
         return $name;
     }
-    public static function uploadFiles()
+
+        private function uploadFiles(Request $request): string
     {
-
         $names = '';
-        for ($i=0;$i<count($_FILES['img']['name']);$i++) {
-            $pic = $_FILES['img']['name'][$i];
+        $i = 0;
+        foreach ((array) $request->file('img') as $file) {
+            if (!$file || !$file->isValid()) {
+                continue;
+            }
             $dir = config('app.upload_image_dir');
-            $name = trim($dir.rand(1000000,9000000).time().'.'.pathinfo($pic,4),'.');
-            $imgs = Input::file('img');
-            $imgs[$i] -> move($dir,$name);
-            $names .= $name.',';
+            $name = $dir . rand(1000000, 9000000) . time() . ($i++) . '.' . strtolower($file->getClientOriginalExtension());
+            $file->move(public_path($dir), basename($name));
+            $names .= $name . ',';
         }
-
         return $names;
     }
+
 
    
 
@@ -101,9 +103,9 @@ class GoodsController extends Controller
         $good = Good::where('id',$request->only('id'))->first();
 
         //判断用户名
-        if($good['title'] != $request->title) {
+        if($good['title'] != $request->input('title')) {
 
-            if(Good::where('title','like', $request->title)->first()){
+            if(Good::where('title','like', $request->input('title'))->first()){
 
                 return back()->with('error','文章标题已存在');
 
@@ -116,12 +118,12 @@ class GoodsController extends Controller
         $good -> status = $data['status'];
         $good->content = $data['content'];
 
-        if($_FILES['showImg']['error']==0){
-            self::updateFile();
-            $good->img = self::uploadFile();
+        if($request->hasFile('showImg')){
+            $this->deleteImage($good->showImg, 'good.png');
+            $good->showImg = $this->uploadFile($request, 'showImg');
         }
 
-        if($_FILES['img']['error'][0]==0)
+        if($request->file('img'))
         {
             $pics = Good::select('img')->where('id',$data['id'])->get();
             foreach (explode(',',$pics[0]->img) as $value)
@@ -130,28 +132,26 @@ class GoodsController extends Controller
                     unlink($value);
                 }
             }
-            $good->img = self::uploadFiles();
+            $good->img = $this->uploadFiles($request);
         }
         $good -> save();
 
         return redirect('admin/good')->with('info','更新成功');
     }
 
-    public static function updateFile()
+        //删除旧图片文件(与默认占位图相同的跳过)
+    private function deleteImage(?string $img, string $default): void
     {
-        dump(Input::only('id'));
-        $pic = Good::select('img')->where('id',Input::only('id'))->first();
-
-        $dbpic = '.'.$pic['img'];
-
-        $defaultpic = config('app.upload_image_dir').'good.png';
-
-
-        if($dbpic != $defaultpic)
-        {
-            @unlink(realpath($dbpic));
+        $dir = config('app.upload_image_dir');
+        if (!$img || $img == $dir . $default) {
+            return;
+        }
+        $full = public_path($img);
+        if (is_file($full)) {
+            @unlink($full);
         }
     }
+
 
     public function getDelete(Request $request)
     {

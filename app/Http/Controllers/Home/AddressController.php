@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 
-use App\Address;
+use App\Models\Address;
 
 
 class AddressController extends Controller
@@ -35,13 +35,11 @@ class AddressController extends Controller
         if($address->save()){
             $this->data['status'] = 0;
             $this->data['msg'] = $address->id;
-            echo json_encode($this->data);
-            die;
+            return response()->json($this->data);
         }else{
             $this->data['status'] = 1;
             $this->data['msg'] = '服务器出错,请稍后重试';
-            echo json_encode($this->data);
-            die;
+            return response()->json($this->data);
         }
     }
 
@@ -54,12 +52,11 @@ class AddressController extends Controller
         if($address->delete()){
             $this->data['status'] = 0;
             $this->data['msg'] = 'ok';
-            echo json_encode($this->data);
+            return response()->json($this->data);
         }else{
             $this->data['status'] = 1;
             $this->data['msg'] = '请刷新网页';
-            echo json_encode($this->data);
-            die;
+            return response()->json($this->data);
         }
     }
     public static function getAddressByUid($uid)

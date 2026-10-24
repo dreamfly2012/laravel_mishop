@@ -3,8 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Http\Requests\Request;
-use App\User;
-use Illuminate\Support\Facades\Input;
+use App\Models\User;
 
 class UserUpdateRequest extends Request
 {

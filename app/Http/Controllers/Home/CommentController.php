@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Home;
 
-use App\Comment;
-use App\Sku;
+use App\Models\Comment;
+use App\Models\Sku;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
@@ -23,7 +23,7 @@ class CommentController extends Controller
 //        
         $order_id = $data['order_id'];
         
-        return view('\home\comment',['sku'=>$sku,'order_id'=>$order_id]);
+        return view('home.comment',['sku'=>$sku,'order_id'=>$order_id]);
     }
 
     public function insert(Request $request)

@@ -6,8 +6,8 @@ use Illuminate\Http\Request;
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
-use App\HelpCate;
-use App\HelpArticle;
+use App\Models\HelpCate;
+use App\Models\HelpArticle;
 
 class HelpController extends Controller
 {
@@ -101,9 +101,9 @@ class HelpController extends Controller
         $nav = HelpCate::find($request->input('id'));
         $nav->status = $request->input('status');
         if($nav->save()){
-            echo 0;die;
+            return response('0');
         }else{
-            echo 1;die;
+            return response('1');
         }
     }
         /**
@@ -114,9 +114,9 @@ class HelpController extends Controller
         $nav = HelpCate::find($request->input('id'));
         $nav->show = $request->input('status');
         if($nav->save()){
-            echo 0;die;
+            return response('0');
         }else{
-            echo 1;die;
+            return response('1');
         }
     }
     /**
@@ -271,7 +271,7 @@ class HelpController extends Controller
         $paginator = new \Illuminate\Pagination\LengthAwarePaginator($articles, count($articles),$request->input('num',10));
         // $paginator = $paginator->setPath(route('admin.help.article'));
         //设置分页href路径
-        $paginator=$paginator->setPath('/admin/help/article');
+        $paginator=$paginator->withPath('/admin/help/article');
         //数组截数据 显示
         $pageout=array_slice($articles, ($page-1)*$pagesize,$pagesize);
 
@@ -347,9 +347,9 @@ class HelpController extends Controller
         $nav = HelpArticle::find($request->input('id'));
         $nav->status = $request->input('status');
         if($nav->save()){
-            echo 0;die;
+            return response('0');
         }else{
-            echo 1;die;
+            return response('1');
         }
     }
     /**
@@ -393,75 +393,6 @@ class HelpController extends Controller
             return back()->with('info','删除成功');
         }else{
             return back()->with('error','删除失败');
-        }
-    }
-    /**
-     * 插入数据
-     */
-    public function getData()
-    {
-        $str = file_get_contents('./data/ad.html');
-        // preg_match_all('/<dt>(.*)<\/dt>.*<a.*>(.*)<\/a>/isU',$str,$data1);
-        preg_match_all('/<dt>(.*)<\/dt>/isU',$str,$data1);
-        // preg_match_all('/<a.*>(.*)<\/a>/isU',$str,$data2);
-        // preg_match_all('/<(dt|a).*>(.*)<\//isU',$str,$data1);
-        foreach($data1[1] as $k=>$v){
-            // if($data1[1][$k] == 'dt'){
-                $res = new HelpCate;
-                $res->status = 1;
-                $res->name = $v;
-                $res->show = 1;
-                $res->pid = 1;
-                $res->path = $this->dealPath(1);
-                if($res->save()){
-                    $pid = $res->id;
-                }
-            // }
-            // if($data1[1][$k]=='a'){
-            //     $res = new HelpCate;
-            //     $res->status = 1;
-            //     $res->name = $v;
-            //     $res->show = 1;
-            //     $res->path = $this->dealPath($pid);
-            //     $res->pid = $pid;
-            //     $res->save();
-            // }
-        }
-    }
-    /**
-     * 插入文章数据
-     */
-    public function getArticleData()
-    {
-        $curl = new \Curl\Curl;
-        $str = file_get_contents('./data/ad.html');
-        // preg_match_all('/<dt>(.*)<\/dt>.*<a.*>(.*)<\/a>/isU',$str,$data);
-        preg_match_all('/<(dt|a)(.*)>(.*)<\//isU',$str,$data);
-        
-        foreach($data[1] as $k=>$v){
-            if($data[1][$k] == 'dt'){
-               
-                $res = HelpCate::where('name',$data[3][$k])->first();
-                //查找分类Id
-                $pid = $res->id;
-                
-            }
-
-            if($data[1][$k]=='a'){
-                //获取链接地址
-                preg_match('/href="(.*)"/isU',$data[2][$k],$link);
-                $curl->get('http:'.$link[1]);
-
-                preg_match('/<h2>(.*)<\/h2>.*class="service-right-section">(.*)<\/div>/isU',$curl->response,$temp);
-                if(!empty($temp)){
-                    $at = new HelpArticle;
-                    $at->title = $temp[1];
-                    $at->help_cate_id = $pid;
-                    $at->status = 1;
-                    $at->content = trim($temp[2]).'</div>';
-                    $at->save();
-                }
-            }
         }
     }
 }

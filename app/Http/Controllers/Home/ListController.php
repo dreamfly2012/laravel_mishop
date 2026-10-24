@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Home;
 
-use App\Cate;
-use App\Good;
-use App\Sku;
+use App\Models\Cate;
+use App\Models\Good;
+use App\Models\Sku;
 use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
@@ -19,8 +19,7 @@ class ListController extends Controller
         $good = Good::find($request->only('id')['id']);
 
         if(!$good){
-            echo '<script>alert("暂无数据");window.location.href="/";</script>';
-            
+            return redirect('/');
         }
         $good->img = explode(',',$good->img);
 

@@ -6,7 +6,7 @@
     </div>
     
     <div class="mws-panel-body no-padding">
-        @if(count(session('errors')))
+        @if($errors->any())
         <div class="mws-form-message error">
             错误信息提示:
             <ul>

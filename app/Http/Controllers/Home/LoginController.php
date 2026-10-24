@@ -2,14 +2,13 @@
 
 namespace App\Http\Controllers\Home;
 
-use App\User;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use Gregwar\Captcha\CaptchaBuilder;
-use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Mail;
 
 
@@ -25,10 +24,6 @@ class LoginController extends Controller
         $username = $request->input('username');
         $password = $request->input('password');
         $Vcode = $request->input('Vcode');
-
-        
-        dump(session('Vcode'));
-        die;
 
         if(session('Vcode')!=$Vcode){
             return back()->with('error','验证码有误!');
@@ -136,10 +131,10 @@ class LoginController extends Controller
         $phrase = $builder->getPhrase();
 
         //把内容存入session
-        Input::session()->flash('Vcode', $phrase);
+        session()->flash('Vcode', $phrase);
         //生成图片
-        header("Cache-Control: no-cache, must-revalidate");
-        header('Content-Type: image/jpeg');
-        $builder->output();
+        ob_start();
+        $builder->output(false);
+        return response(ob_get_clean(), 200)->header('Content-Type', 'image/jpeg');
     }
 }

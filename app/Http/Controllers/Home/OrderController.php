@@ -8,10 +8,10 @@ use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Home\AddressController;
 
-use App\Cart;
-use App\Order;
-use App\OrderGoods;
-use App\Address;
+use App\Models\Cart;
+use App\Models\Order;
+use App\Models\OrderGoods;
+use App\Models\Address;
 
 class OrderController extends Controller
 {
@@ -64,8 +64,7 @@ class OrderController extends Controller
         if(empty($uid)){
             $this->data['status'] = 2;
             $this->data['msg'] = '请登录';
-            echo json_encode($this->data);
-            die;
+            return response()->json($this->data);
         }
         $listItem = $request->input('listItem');
 
@@ -73,17 +72,15 @@ class OrderController extends Controller
         if(empty($listItem)){
             $this->data['status'] = 4;
             $this->data['msg'] = '购物车为空';
-            echo json_encode($this->data);
-            die;
+            return response()->json($this->data);
         }
         session(['listItem'=>$listItem]);
-        \Session::save();
+        \session()->save();
 
         //跳转去订单确认页面
         $this->data['status'] = 0;
         $this->data['msg'] = '/order/confirm';
-        echo json_encode($this->data);
-        die;
+        return response()->json($this->data);
     }
     /**
      * 生成订单 (确认订单跳转到订单支付页)
@@ -104,7 +101,7 @@ class OrderController extends Controller
         $order->user_id = $uid;
         $order->order_status = 0;//初始化订单
         $order->pay_status = 0;//未支付
-        $order->order_num = time('YmdHis').rand(100000,999999);//订单编号
+        $order->order_num = date('YmdHis').rand(100000,999999);//订单编号
         $order->pack_fee = $request->input('packFee');//运费
         $order->pack_time = 0;
         $order->total_price = $request->input('totalPrice');//总价
@@ -121,14 +118,14 @@ class OrderController extends Controller
         }else{
             $this->data['status'] = 1;
             $this->data['msg'] = '服务异常,请稍后再试';
-            echo json_encode($this->data);die;
             \DB::rollBack();
+            return response()->json($this->data);
         }
         if(!$order->save()){
             $this->data['status'] = 2;
             $this->data['msg'] = '服务异常,请稍后再试';
-            echo json_encode($this->data);die;
             \DB::rollBack();
+            return response()->json($this->data);
         }
         //将商品信息插入到数据库中
         foreach($carts as $k=>$v){
@@ -144,8 +141,8 @@ class OrderController extends Controller
             if(!$orderGoods->save()){
                 $this->data['status'] = 3;
                 $this->data['msg'] = '服务异常,请稍后再试';
-                echo json_encode($this->data);die;
                 \DB::rollBack();
+                return response()->json($this->data);
             }else{
                 $v->delete();
             }
@@ -157,7 +154,7 @@ class OrderController extends Controller
         session(['listItem'=>null]);
         $this->data['status'] = 0;
         $this->data['msg'] = $order->id;
-        echo json_encode($this->data);die;
+        return response()->json($this->data);
 
 
     }

@@ -1,17 +1,15 @@
 <?php
 
-namespace App\Http\Controllers\admin;
+namespace App\Http\Controllers\Admin;
 
-use App\Comment;
-use App\Good;
+use App\Models\Comment;
+use App\Models\Good;
 use Illuminate\Http\Request;
-
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Input;
 
 class CommentController extends Controller
 {
@@ -46,13 +44,12 @@ class CommentController extends Controller
         $Comment->status = 1;
         if($request->hasFile('pic'))
         {
-            $Comment->img = self::uploadFile();
+            $Comment->img = $this->uploadFile($request);
 
         }else{
             $Comment->img = config('app.upload_image_dir').'Good.png';
         }
         $Comment->content = $data['content'];
-
 
         if($Comment->save()){
             return redirect('admin/comment/add')->with('info','添加成功');
@@ -61,18 +58,19 @@ class CommentController extends Controller
         }
     }
 
-    public static function uploadFile()
+    //上传图片
+    private function uploadFile(Request $request, string $field = 'pic'): string
     {
-        $pic = $_FILES['pic']['name'];
+        $file = $request->file($field);
         $dir = config('app.upload_image_dir');
-        $name = trim($dir.rand(1000000,9000000).time().'.'.pathinfo($pic,4),'.');
-        Input::file('pic')->move($dir,'/'.$name);
+        $name = $dir . rand(1000000, 9000000) . time() . '.' . strtolower($file->getClientOriginalExtension());
+        $file->move(public_path($dir), basename($name));
         return $name;
     }
 
     public function getEdit(Request $request)
     {
-        $Comment = Comment::find($request->id);
+        $Comment = Comment::find($request->input('id'));
         $Goods = Good::all();
         $Comments = Comment::where('pid',0)->get();
         return view('admin.comment.update',['comment'=>$Comment,'comments'=>$Comments,'goods'=>$Goods,'title'=>'修改详情']);
@@ -84,9 +82,9 @@ class CommentController extends Controller
         $Comment = Comment::where('id',$request->only('id'))->first();
 
         //判断用户名
-        if($Comment['title'] != $request->title) {
+        if($Comment['title'] != $request->input('title')) {
 
-            if(Comment::where('title','like', $request->title)->first()){
+            if(Comment::where('title','like', $request->input('title'))->first()){
 
                 return back()->with('error','文章标题已存在');
 
@@ -100,31 +98,14 @@ class CommentController extends Controller
         $Comment -> status = $data['status'];
         $Comment -> content = $data['content'];
         if($request->hasFile('pic')){
-            self::updateFile();
-            $Comment->img = self::uploadFile();
+            $this->deleteImage($Comment->img, 'comment.png');
+            $Comment->img = $this->uploadFile($request);
         }
 
         $Comment -> save();
         
-        return redirect('/admin/Comment')->with('info','更新成功');
+        return redirect('/admin/comment')->with('info','更新成功');
     }
-
-    public static function updateFile()
-    {
-        $pic = Comment::select('img')->where('id',Input::only('id'))->first();
-        
-        $dbpic = $pic['img'];
-
-        $defaultpic = config('app.upload_image_dir').'comment.png';
-
-        if($dbpic != $defaultpic)
-        {
-            if(file_exists($dbpic)){
-                unlink(realpath($dbpic));
-            }
-        }
-    }
-
 
     public function getDelete(Request $request)
     {

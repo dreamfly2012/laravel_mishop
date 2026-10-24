@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Http\Controllers\admin;
+namespace App\Http\Controllers\Admin;
 
-use App\Cate;
-use App\User;
+use App\Models\Cate;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 
@@ -12,7 +12,6 @@ use App\Http\Controllers\Controller;
 
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Input;
-use Illuminate\Support\Facades\Mail;
 
 class UserController extends Controller
 {
@@ -34,7 +33,7 @@ class UserController extends Controller
         $user->status = 1;
         if($request->hasFile('pic'))
         {
-            $user->pic = self::uploadFile();
+            $user->pic = $this->uploadFile($request);
 
         }else{
             $user->pic = config('app.upload_image_dir').'user.png';
@@ -51,14 +50,15 @@ class UserController extends Controller
     }
 
     //上传头像
-    public static function uploadFile()
+        private function uploadFile(Request $request, string $field = 'pic'): string
     {
-        $pic = $_FILES['pic']['name'];
+        $file = $request->file($field);
         $dir = config('app.upload_image_dir');
-        $name = trim($dir.rand(1000000,9000000).time().'.'.pathinfo($pic,4),'.');
-        Input::file('pic')->move($dir,$name);
+        $name = $dir . rand(1000000, 9000000) . time() . '.' . strtolower($file->getClientOriginalExtension());
+        $file->move(public_path($dir), basename($name));
         return $name;
     }
+
 
     //编辑信息
     public function getEdit(Request $request)
@@ -87,27 +87,27 @@ class UserController extends Controller
         $user -> email = $request -> email;
         $user -> phone = $request -> phone;
         if($request->hasFile('pic')){
-            self::updateFile();
-            $user->pic = self::uploadFile();
+            $this->deleteImage($user->pic, 'user.png');
+            $user->pic = $this->uploadFile($request);
         }
 
         $user -> save();
         return redirect('admin/user')->with('info','更新成功');
     }
     
-    public static function updateFile()
+        //删除旧图片文件(与默认占位图相同的跳过)
+    private function deleteImage(?string $img, string $default): void
     {
-        $pic = User::select('pic')->where('id',Input::only('id'))->first();
-        $dbpic = '.'.$pic['pic'];
-
-        $defaultpic = config('app.upload_image_dir').'user.png';
-
-        if($dbpic != $defaultpic){
-            if(file_exists(realpath($dbpic))) {
-                unlink(realpath($dbpic));
-            }
+        $dir = config('app.upload_image_dir');
+        if (!$img || $img == $dir . $default) {
+            return;
+        }
+        $full = public_path($img);
+        if (is_file($full)) {
+            @unlink($full);
         }
     }
+
 
     public function getDelete(Request $request)
     {
@@ -118,88 +118,4 @@ class UserController extends Controller
             return back()->with('error','删除失败!');
         }
     }
-
-    
-
-
-
-
-
-/*
- * 网站前台部分
- *
- * */
-
-    public function login()
-    {
-        return view('home.user.login',['title','用户登录页']);
-    }
-
-    public function doLogin()
-    {
-        echo '111';
-    }
-    /* 注册 */
-    public function register()
-    {
-        echo '111';
-
-    }
-    public function doRegister(Request $request)
-    {
-  
-        $info = $request->all();
-        $user = new User();
-        $user -> username = $info['username'];
-        $user -> password = $info['password'];
-        $user -> email = $info['email'];
-//        $user -> token = str_random(50);
-        
-        $user -> save();
-
-        Mail::send('email.register', ['user' => $user], function ($m) use ($user) {
-            $m->from(env('MAIL_USERNAME'), config('app.APP_NAME'));
-            $m->to($user['email'])->subject('Your Reminder!');
-        });
-    }
-    /* 激活 */
-    public function active()
-    {
-        echo '111';
-
-    }
-    public function doActive()
-    {
-        echo '111';
-
-    }
-    /* 忘记密码 */
-    public function forget()
-    {
-
-    }
-    public function doForget()
-    {
-        echo '111';
-
-    }
-    /* 重置密码 */
-    public function reset()
-    {
-        echo '111';
-
-    }
-    public function doReset()
-    {
-        echo '111';
-
-    }
-
-
-
-
-
-
-
-
 }
