@@ -12,7 +12,7 @@
 
 ## Setup
 
-1. 建 MySQL 库名 `xm` 并导入根目录 `xm.sql`——这是唯一数据源。`php artisan migrate` **不要运行**（`database/migrations/` 只是框架默认三张表，与 `xm` 里既有的 `users` 等表冲突）。`xm` 中有 13 张业务表，MyISAM。
+1. 建 MySQL 库名 `xm` 并导入根目录 `xm.sql`——这是唯一数据源（含完整演示数据：148 商品 / 282 SKU / 89 分类全有商品 / 25 订单 / 68 评价；数据可用 `php database/seed_extra.php` 重新生成，该脚本只给"无商品的分类"填充，幂等）。`php artisan migrate` **不要运行**（`database/migrations/` 只是框架默认三张表，与 `xm` 里既有的 `users` 等表冲突）。5.5 原始 dump 保留在 `xm.sql.5.5.orig`。
 2. `cp .env.example .env` 然后改 DB_*（本地 phpstudy 为 root/123456）并 `php artisan key:generate`。`.env` 关键项: `SESSION_DRIVER=file`、`CACHE_STORE=file`（`xm` 库没有 sessions/cache 表）。
 3. `composer install`（已配置阿里云 composer 镜像 repository）；`php artisan serve` 即可。
 4. 后台登录 `/admin/login`，账号 `admin` / `iloveyou`（**移植时已把库中 admin(id=1) 密码哈希重置为该值**，原种子哈希与文档不符）。`LoginMiddleware` 要求 `user_id==1`，别动 admin 的 id。
@@ -26,6 +26,7 @@
 
 ## 移植已修复的坑（别回头改回去）
 
+- schema 变更：`skus.good_id` 已从 `tinyint` 改为 `INT UNSIGNED`（商品超过 127 个时老表溢出，随 `xm.sql` 保留）。
 - 所有 `echo json_encode(...); die;` 已改为 `return response()->json(...)`（private 辅助方法改为返回 Response，调用点 `return $this->helper(...)`）。裸 `echo + die` 会破坏 L12 的 session/响应生命周期。
 - `Input` facade 已删除，一律 `$request->input()/file()/only()`；`$request->title` 这类魔法属性访问已改为 `$request->input('title')`。
 - 相对路径文件操作（`./data/...`、上传目录）已改为 `public_path(...)` + `config('app.upload_image_dir')`（值 `/image/upload/`，库里存该前缀绝对路径，种子数据与此一致）。
