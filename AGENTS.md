@@ -12,10 +12,18 @@
 
 ## Setup
 
-1. 建 MySQL 库名 `xm` 并导入根目录 `xm.sql`——这是唯一数据源（含完整演示数据：148 商品 / 282 SKU / 89 分类全有商品 / 25 订单 / 68 评价；数据可用 `php database/seed_extra.php` 重新生成，该脚本只给"无商品的分类"填充，幂等）。`php artisan migrate` **不要运行**（`database/migrations/` 只是框架默认三张表，与 `xm` 里既有的 `users` 等表冲突）。5.5 原始 dump 保留在 `xm.sql.5.5.orig`。
+1. 建 MySQL 库名 `xm` 并导入根目录 `xm.sql`——这是唯一数据源（含完整演示数据：148 商品 / 282 SKU / 89 分类全有商品 / 25 订单 / 68 评价；数据可用 `php database/seed_extra.php` 重新生成，该脚本只给"无商品的分类"填充，幂等）。**商品图已全部本地化**（`public/image/upload/mi-*.jpg|png|webp`，182 张真实小米官方图，站点不依赖任何外图链）。`php artisan migrate` **不要运行**（`database/migrations/` 只是框架默认三张表，与 `xm` 里既有的 `users` 等表冲突）。5.5 原始 dump 保留在 `xm.sql.5.5.orig`。
 2. `cp .env.example .env` 然后改 DB_*（本地 phpstudy 为 root/123456）并 `php artisan key:generate`。`.env` 关键项: `SESSION_DRIVER=file`、`CACHE_STORE=file`（`xm` 库没有 sessions/cache 表）。
 3. `composer install`（已配置阿里云 composer 镜像 repository）；`php artisan serve` 即可。
 4. 后台登录 `/admin/login`，账号 `admin` / `iloveyou`（**移植时已把库中 admin(id=1) 密码哈希重置为该值**，原种子哈希与文档不符）。`LoginMiddleware` 要求 `user_id==1`，别动 admin 的 id。
+
+### 图片/数据补全管线（脚本顺序，均可重复执行）
+
+1. `php database/seed_extra.php` — 幂等补全商品/SKU/订单/评价（只处理"无商品的分类"），重生成 `public/data/stargoods.json`。
+2. `php database/seed_images.php` — 双源抓真实小米官图：mi.com 型号页（老款静态页含页面专属 `mifile.cn/f/i/<年>/<slug>/` 图）+ cn.bing.com 图片搜索（域名白名单：小米官方 CDN 优先、国内电商/数码媒体图床兜底；原图失败退 Bing 缩略图）。下载→GD 压宽 1000px→`public/image/upload/mi-*`（流式落盘防内存爆）→产出 `database/mi-images.json`（分类桶 → 本地图列表）。外网需可达 mi.com / cn.bing.com / 大陆 CDN。
+3. `php database/seed_replace_images.php` — 按桶把库内全部死链 hqbcdn 图换成 `mi-*` 本地图（goods/skus/cates；偏移量取实体 id，重跑结果稳定），末尾全库复查残留。
+4. `php database/regen_navdata.php` — 重生成 `public/data/indexNav.js`（逻辑同 Admin/IndexController::getAjaxcreate，后台改导航后亦可手动刷）。
+5. 分类桶定义集中在 `database/buckets.php`（关键词→价格区间/SKU 版本/颜色桶），`seed_extra.php` 与配图预案共用，保持生成风格与配图归类一致。改桶后需重跑 2-3 补图。
 
 ## 路由（移植要点）
 
