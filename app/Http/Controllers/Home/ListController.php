@@ -59,18 +59,17 @@ class ListController extends Controller
     public function list_(Request $request)
     {
         $data = $request->only('id');
-        
-        $cates = Cate::where('pid',$data)->get();
+        $cateId = $data['id'] ?? null;
 
-        $arr = [];
-
-        foreach ($cates as $key => $value) {
-            $arr[] = $value->id;
+        //目标分类自身 + 其子类 下所有商品 (侧边栏点的是最末级分类)
+        $cateIds = Cate::where('pid', $cateId)->get()->pluck('id')->all();
+        if (!is_null($cateId)) {
+            $cateIds[] = (int)$cateId;
         }
 
-
-
-        $goods = Good::whereIn('cate_id',$arr)->get();
+        $goods = $cateIds
+            ? Good::whereIn('cate_id', $cateIds)->get()
+            : Good::all();
 
 
 

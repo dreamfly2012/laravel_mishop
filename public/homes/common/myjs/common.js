@@ -120,7 +120,7 @@ $(function(){
                             temp+= '<ul class="children-list children-list-col children-col-1">';
                                 for(var j=0;j<arr[i]['child'].length;j++){
                                     temp+= '<li class="star-goods">';
-                                        temp+= '<a class="link" href="/detail?id='+arr[i]['child'][j]["id"]+'">';
+                                        temp+= '<a class="link" href="/list?id='+arr[i]['child'][j]["id"]+'">';
                                             temp+= '<img class="thumb" src="'+arr[i]['child'][j]["img"]+'" width="40" height="40" alt="">';
                                             temp+= '<span class="text">'+arr[i]['child'][j]["title"]+'</span>';
                                         temp+= '</a>';
@@ -210,7 +210,7 @@ $(function(){
                                             str +='</a>';
                                         str +='</div>';
                                         str +='<div class="title">';
-                                            str +='<a href="'+navData[i]['info'][j]['good_id']+'">'+navData[i]['info'][j]['title']+'</a>';
+                                            str +='<a href="/detail?id='+navData[i]['info'][j]['good_id']+'">'+navData[i]['info'][j]['title']+'</a>';
                                         str +='</div>';
                                         str +='<p class="price">'+navData[i]['info'][j]['price']+'</p>';
                                     str +='</li>';
