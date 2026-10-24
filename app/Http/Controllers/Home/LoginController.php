@@ -9,6 +9,7 @@ use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use Gregwar\Captcha\CaptchaBuilder;
+use Gregwar\Captcha\PhraseBuilder;
 use Illuminate\Support\Facades\Mail;
 
 
@@ -25,7 +26,7 @@ class LoginController extends Controller
         $password = $request->input('password');
         $Vcode = $request->input('Vcode');
 
-        if(session('Vcode')!=$Vcode){
+        if(!$this->checkVcode($Vcode)){
             return back()->with('error','验证码有误!');
         }
 
@@ -56,7 +57,7 @@ class LoginController extends Controller
     {
         $Vcode = $request->input('Vcode');
 
-        if(session('Vcode')!=$Vcode){
+        if(!$this->checkVcode($Vcode)){
             return back()->with('error','验证码有误!');
         }
 
@@ -121,20 +122,45 @@ class LoginController extends Controller
         return redirect('/login');
     }
 
+    /**
+     * 校验验证码：忽略大小写与首尾空格；session 里没有验证码时一律判定失败
+     */
+    private function checkVcode($input)
+    {
+        $expected = (string) session('Vcode');
+        $given = trim((string) $input);
+
+        return $expected !== '' && $given !== '' && strcasecmp($expected, $given) === 0;
+    }
+
     public function getCaptcha()
     {
-        //生成验证码图片的Builder对象，配置相应属性
-        $builder = new CaptchaBuilder;
-        //可以设置图片宽高及字体
-        $builder->build($width = 100, $height = 40, $font = null);
+        // 4 位字符，只用小写字母和数字，并剔除 0/o/1/l/i 等易混淆字符
+        $builder = new CaptchaBuilder(null, new PhraseBuilder(4, '23456789abcdefghjkmnpqrstuvwxyz'));
+
+        // 高对比配色：浅底深字（设置了颜色后，库会跳过反色/边缘检测等后期效果）
+        $builder->setBackgroundColor(250, 250, 250)
+            ->setTextColor(40, 40, 40)
+            ->setMaxAngle(4)          // 字符倾斜角度，默认 8
+            ->setMaxOffset(2)         // 字符上下偏移，默认 5
+            ->setMaxBehindLines(3)    // 文字背后的干扰线
+            ->setMaxFrontLines(0)     // 压在文字上的干扰线，最影响辨认，去掉
+            ->setDistortion(false);   // 关掉波纹扭曲
+
+        // 尺寸与前台 CSS 保持一致，避免浏览器拉伸放大导致发虚
+        $builder->build(125, 46);
+
         //获取验证码的内容
         $phrase = $builder->getPhrase();
 
         //把内容存入session
         session()->flash('Vcode', $phrase);
-        //生成图片
+
+        //生成图片（用 PNG 无损输出；原来 output(false) 会把 JPEG 质量压到最低，字全糊了）
         ob_start();
-        $builder->output(false);
-        return response(ob_get_clean(), 200)->header('Content-Type', 'image/jpeg');
+        imagepng($builder->getGd());
+        return response(ob_get_clean(), 200)
+            ->header('Content-Type', 'image/png')
+            ->header('Cache-Control', 'no-store, no-cache, must-revalidate');
     }
 }

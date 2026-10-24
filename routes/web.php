@@ -46,6 +46,9 @@ Route::get('/cart/ajaxaddcart', [Home\CartController::class, 'ajaxAddCart']);
 Route::post('/cart/ajaxaddcart', [Home\CartController::class, 'ajaxAddCart']);
 Route::get('/cart/init', [Home\CartController::class, 'getInit']);
 
+// 商品收藏 (原 ECShop 遗留 user.php?act=collect; 未登录提示跳登录)
+Route::get('/collect', [Home\CollectController::class, 'getIndex']);
+
 Route::group(['middleware' => 'home'], function () {
     // 订单
     Route::get('/order/confirm', [Home\OrderController::class, 'confirm']);

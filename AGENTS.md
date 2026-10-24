@@ -41,9 +41,11 @@
 - 上传逻辑重写为实例方法 `uploadFile($request, $field)` + `deleteImage($img, $default)`（原来 static 方法引用不存在的作用域 `$request` + `$_FILES`，本身跑不通）。
 - Blade 里 `@if(count(session('errors')))` 已全部改为 `@if($errors->any())`（PHP 8 对 count(null) 抛 TypeError）。
 - `regex: /^\w{3,20}$/` 的空格定界损坏正则已修正；`time('YmdHis')` 笔误已改 `date()`；`$sku->$request->input('num')` 已改 `(int)$request->input('num')`。
+- `users` 表 `phone/level/pic` 补空串默认值（原 NOT NULL 无默认，注册流程写入直接 500）。
+- 商品收藏功能补齐：原 ECShop 遗留 JS 调 `user.php?act=collect`（404 且库中无收藏表）。新增 `collects` 表 + `Collect` 模型 + `CollectController`，路由 `GET /collect`（同 `/cart` 不挂 `home` 中间件，未登录在方法内返回 `{status:1, redirect:'/login'}` 让前端提示跳登录）。收藏/取消为切换语义。
 - `app/MyFunction.php`（含 Windows 字体贴图的 `BNZ_*` 死代码）已删除，只保留 `sub_title()` 于 `app/helpers.php`（composer files autoload）。原 CartController 的 `getSe`/`getLg`（会话后门）已删。
 - `Admin/HelpController` import 数据用的 `getData`/`getArticleData`（依赖旧 curl 包）已删。
-- 登录验证码为 `gregwar/captcha`，输出已改为 `response(...)->header('Content-Type','image/jpeg')`（原为裸 `header()`）。
+- 登录验证码为 `gregwar/captcha`（`/login/captcha`，登录/注册共用）：4 位小写字母数字（排除 0/o/1/l/i），关掉波纹扭曲和压字干扰线，浅底深字；输出改 `imagepng($builder->getGd())` 无损返回 `image/png`（原 `output(false)` 把 JPEG 质量传成 false，画质被压到最低，字糊成一团）。图片 125x46 与 CSS 自然尺寸一致，避免浏览器拉伸发虚；校验用 `strcasecmp` 忽略大小写（部分字体把字符画成大写）。
 
 ## 其他注意
 

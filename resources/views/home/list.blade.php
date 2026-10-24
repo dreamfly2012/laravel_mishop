@@ -88,8 +88,8 @@
                     </div>
 
                     <div class="actions clearfix">
-                        <a href="javascript:collect(82);" class="btn-like J_likeGoods"><i class="iconfont"></i> <span>收藏</span></a>
-                        <a href="javascript:addToCart(82)" class="btn-buy J_buyGoods"><span>购买</span> <i class="iconfont"></i></a>
+                        <a href="javascript:collect({{$good->id}});" class="btn-like J_likeGoods"><i class="iconfont"></i> <span>收藏</span></a>
+                        <a href="javascript:addToCart({{$good->id}})" class="btn-buy J_buyGoods"><span>购买</span> <i class="iconfont"></i></a>
                     </div>
 
                 </div>

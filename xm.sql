@@ -110,6 +110,34 @@ INSERT INTO `cates` VALUES (1,'手机 平板','','0','0',1,'2016-07-25 01:01:56'
 UNLOCK TABLES;
 
 --
+-- Table structure for table `collects`
+--
+
+DROP TABLE IF EXISTS `collects`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+ SET character_set_client = utf8mb4 ;
+CREATE TABLE `collects` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL COMMENT '用户id',
+  `good_id` int(10) unsigned NOT NULL COMMENT '商品id',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_user_good` (`user_id`,`good_id`),
+  KEY `good_id` (`good_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='商品收藏';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `collects`
+--
+
+LOCK TABLES `collects` WRITE;
+/*!40000 ALTER TABLE `collects` DISABLE KEYS */;
+/*!40000 ALTER TABLE `collects` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `comments`
 --
 
@@ -401,16 +429,16 @@ DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `username` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `phone` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+  `phone` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
   `email` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
   `password` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `level` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `pic` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+  `level` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '0',
+  `pic` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
   `status` int(11) NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=54 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=55 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -432,4 +460,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-10-24 20:29:18
+-- Dump completed on 2026-10-24 20:40:46

@@ -410,5 +410,32 @@
         });
         return false;
     });
+
+    // 商品收藏/取消收藏 (原 ECShop 遗留能力对应接口 /collect)
+    $('#goodsDetailCollectBtn').click(function () {
+        var $btn = this;
+        $.ajax({
+            type: "get",
+            dataType: 'json',
+            url: "/collect",
+            data: {id: {{ $good->id }}},
+            error: function() {
+                alert("系统错误请稍后再试!");
+            },
+            success: function(data) {
+                if (data.status == 1) {
+                    // 未登录: 提示并跳登录
+                    if (confirm(data.info + ",是否前往登录?")) {
+                        window.location.href = data.redirect;
+                    }
+                    return;
+                }
+                alert(data.info);
+                // 收藏成功点亮喜欢, 取消收藏还原
+                $($btn).toggleClass('current', data.status == 0);
+            }
+        });
+        return false;
+    });
 </script>
 @endsection

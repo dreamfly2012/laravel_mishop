@@ -962,10 +962,11 @@ input {
 }
 .chkcode_img {
 	margin-left: 7px;
-	margin-top:8px;
+	margin-top: 0;
 	vertical-align: middle;
 	cursor: pointer;
 	width:125px;
+	height:46px;
 }
 .btn332 {
 	width: 330px;

@@ -337,7 +337,7 @@ function addToCartResponse(result)
  */
 function collect(goodsId)
 {
-  Ajax.call('user.php?act=collect', 'id=' + goodsId, collectResponse, 'GET', 'JSON');
+  Ajax.call('/collect', 'id=' + goodsId, collectResponse, 'GET', 'JSON');
 }
 
 /* *
@@ -345,7 +345,13 @@ function collect(goodsId)
  */
 function collectResponse(result)
 {
-  alert(result.message);
+  if (result && result.redirect)
+  {
+    alert(result.info);
+    window.location.href = result.redirect;
+    return;
+  }
+  alert(result && result.info ? result.info : '操作失败, 请稍后再试');
 }
 
 /* *
