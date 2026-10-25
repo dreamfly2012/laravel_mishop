@@ -5,7 +5,7 @@
     <div class="mws-panel-header">
         <span> <i class="icon-table"></i>
             帮助栏目分类页面
-            <a href="/admin/help/cateadd" class="btn btn-danger pull-right" >添加帮助栏目分类</a>
+            <a href="/admin/help/cate-add" class="btn btn-danger pull-right" >添加帮助栏目分类</a>
         </span>
     </div>
     <div class="mws-panel-inner-wrap">
@@ -52,15 +52,15 @@
                             <td><input class="ibutton" data-type="status" cid="{{$v->id}}" type="checkbox" @if($v->status) checked @endif></td>
                             <td>
                                 <span class="btn-group">
-                                    <a href="/admin/help/cateedit?id={{$v->id}}" class="btn btn-small" title="编辑栏目分类">
+                                    <a href="/admin/help/cate-edit/{{$v->id}}" class="btn btn-small" title="编辑栏目分类">
                                         <i class="icon-pencil"></i>
                                     </a>
                                     @if(substr_count($v->paths,',')>2)
-                                    <a href="/admin/help/add?pid={{$v->id}}" class="btn btn-small" title="添加栏目文章">
+                                    <a href="/admin/help/add/{{$v->id}}" class="btn btn-small" title="添加栏目文章">
                                         <i class="icon-plus"></i>
                                     </a>
                                     @endif
-                                    <a href="/admin/help/catedel?id={{$v->id}}" class="btn btn-small" title="删除栏目分类">
+                                    <a href="/admin/help/cate-delete/{{$v->id}}" class="btn btn-small" title="删除栏目分类">
                                         <i class="icon-trash"></i>
                                     </a>
                                 </span>
@@ -206,11 +206,11 @@
             status = status?1:0;
             var $self = $(this);
             var isChangeShow = $(this).find('.ibutton').data('type') == 'show'?true:false;
-            var url = isChangeShow?'/admin/help/ajaxcateshow':'/admin/help/ajaxcatestatus';
+            var url = (isChangeShow?'/admin/help/cate-show/':'/admin/help/cate-status/') + $id;
             $.ajax({
                 url:url,
                 type:'GET',
-                data:{'id':$id,status:status},
+                data:{status:status},
                 success: function(data){
                     if( data==='0' )
                     {

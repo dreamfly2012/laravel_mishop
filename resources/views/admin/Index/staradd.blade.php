@@ -17,7 +17,7 @@
             </ul>
         </div>
         @endif
-        <form id="cate" class="mws-form" action="/admin/indexPage/staradd" method="post">
+        <form id="cate" class="mws-form" action="/admin/index-page/star-add" method="post">
             <div class="mws-form-inline">
                 <div class="mws-form-row">
                     <label class="mws-form-label">小米明星产品id</label>

@@ -32,6 +32,7 @@ class LoginController extends Controller
 
         if(Hash::check($password,$upass)){
 
+            $request->session()->regenerate();
             session(['user_id'=>$user->id]);
             session(['pic'=>$user->pic]);
             return redirect('/admin/user');
@@ -39,9 +40,10 @@ class LoginController extends Controller
         return back()->with('error','密码错误!');
     }
 
-    public function getOutLogin()
+    public function getOutLogin(Request $request)
     {
-        session(['user_id'=>null]);
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
         return redirect('/admin/login');
     }
 }

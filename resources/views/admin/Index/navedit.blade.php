@@ -17,7 +17,7 @@
             </ul>
         </div>
         @endif
-        <form id="cate" class="mws-form" action="/admin/indexPage/navedit" method="post">
+        <form id="cate" class="mws-form" action="/admin/index-page/nav-edit" method="post">
             <div class="mws-form-inline">
                 <div class="mws-form-row">
                     <label class="mws-form-label">导航栏目名称</label>

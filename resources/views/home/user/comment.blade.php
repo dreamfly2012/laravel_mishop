@@ -9,7 +9,7 @@
 @section('content')
     <div class="breadcrumbs">
         <div class="container">
-            <a href='//www.mi.com/index.html'>首页</a>
+            <a href='/'>首页</a>
             <span class="sep">&gt;</span>
             <span>商品评价</span>
         </div>
@@ -27,11 +27,11 @@
                             <div class="box-bd">
                                 <ul class="uc-nav-list">
                                     <li>
-                                        <a href="/user/order/">我的订单</a>
+                                        <a href="/user/order">我的订单</a>
                                     </li>
                                     
                                     <li>
-                                        <a href="/user/comment/">评价晒单</a>
+                                        <a href="/user/comment">评价晒单</a>
                                     </li>
                                     
                                 </ul>
@@ -84,17 +84,17 @@
                                         @foreach($goodsNo as $k=>$v)
                                         <li class="xm-goods-item">
                                             <div class="figure figure-img">
-                                                <a href="/detail?id={{$v->good_id}}" target="_blank">
+                                                <a href="/detail/{{$v->good_id}}" target="_blank">
                                                     <img src="{{$v->img}}" />
                                                 </a>
                                             </div>
                                             <h3 class="title">
-                                                <a href="/detail?id{{$v->good_id}}">{{$v->title}}</a>
+                                                <a href="/detail/{{$v->good_id}}">{{$v->title}}</a>
                                             </h3>
                                             <p class="price">{{$v->price}}元</p>
                                             <p class="rank">{{$v->good->comments()->count()}}人评价</p>
                                             <div class="actions">
-                                                <a class="btn btn-primary btn-small J_btnComment" data-gid="2161000055" href="/comment?id={{$v->good_id}}&order_id={{$v->order_id}}">去评价</a>
+                                                <a class="btn btn-primary btn-small J_btnComment" data-gid="2161000055" href="/comment/{{$v->good_id}}?order_id={{$v->order_id}}">去评价</a>
                                             </div>
                                         </li>
                                         @endforeach
@@ -109,12 +109,12 @@
                                         @foreach($goodsYes as $k=>$v)
                                         <li class="xm-goods-item">
                                             <div class="figure figure-img">
-                                                <a href="/detail?id{{$v->good_id}}" target="_blank">
+                                                <a href="/detail/{{$v->good_id}}" target="_blank">
                                                     <img src="{{$v->img}}" />
                                                 </a>
                                             </div>
                                             <h3 class="title">
-                                                <a href="/detail?id{{$v->good_id}}">{{$v->title}}</a>
+                                                <a href="/detail/{{$v->good_id}}">{{$v->title}}</a>
                                             </h3>
                                             <p class="price">{{$v->price}}元</p>
                                             <p class="rank">{{$v->good->comments()->count()}}人评价</p>
@@ -136,7 +136,6 @@
 @endsection
 
 @section('js')
-<script src="/homes/common/myjs/jquery.min.js"></script>
 <script src="/data/indexNav.js"></script>
 <script src="/data/indexData.js"></script>
 <script src="/homes/common/myjs/common.js"></script>

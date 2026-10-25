@@ -18,7 +18,7 @@
             </ul>
         </div>
         @endif
-        <form id="cate" class="mws-form" action="/admin/help/artedit" method="post">
+        <form id="cate" class="mws-form" action="/admin/help/article-edit" method="post">
             <div class="mws-form-inline">
                 <div class="mws-form-row">
                     <label class="mws-form-label">文章名称</label>

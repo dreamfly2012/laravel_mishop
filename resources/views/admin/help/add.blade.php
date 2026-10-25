@@ -32,7 +32,7 @@
                          <select name="pid"  class="large" id="select">
                             <option value="0">选择分类</option>
                             @foreach($cates as $k=>$v)
-                            <option value="{{$v->id}}" @if(!substr_count($v->path,',')) disabled @endif type="{{substr_count($v->path,',')}}" @if($request->input('pid')==$v->id) selected @endif>
+                            <option value="{{$v->id}}" @if(!substr_count($v->path,',')) disabled @endif type="{{substr_count($v->path,',')}}" @if($request->route('pid')==$v->id) selected @endif>
                             {{$v->name}}</option>
                             @endforeach
                         </select>

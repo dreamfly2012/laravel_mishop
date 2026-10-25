@@ -6,7 +6,8 @@
     <meta name="Keywords" content="">
     <meta name="Description" content="">
 
-    <title>小米官网</title>
+    <title>小米商城</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
 
 
@@ -91,7 +92,7 @@
     </div>
     <div class="nl-footer">
         <div class="nl-f-nav">
-            <p class="nl-f-copyright">©<a href="http://mm.com/user.php#">mi.com</a> 京ICP证110507号 京ICP备10046444号 京公网安备1101080212535号 <a href="http://mm.com/user.php#">京网文[2014]0059-0009号</a></p>
+            <p class="nl-f-copyright">©<a href="/">mi.com</a> 京ICP证110507号 京ICP备10046444号 京公网安备1101080212535号 <a href="/">京网文[2014]0059-0009号</a></p>
         </div>
     </div>
 

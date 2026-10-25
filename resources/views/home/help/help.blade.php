@@ -3,7 +3,7 @@
 @section('myCss')
 <link rel="stylesheet" href="/homes/common/css/exchange/index.min.css" />
 <link rel="stylesheet" href="/homes/common/css/exchange/serviceList.min.css" />
-@show
+@endsection
 @section('content')
 <div class="xm-service-box">
     <!-- 服务支持面包屑 -->
@@ -13,7 +13,7 @@
             <span class="sep">/</span>
             <a href="//www.mi.com/service/buy/">{{$article->helpCate->name}}</a>
             <span class="sep">/</span>
-            <a href="//www.mi.com/service/buy/buytime/">{{$article->helpCate->helpArticle()->find($request->input('id'))->title}}</a>
+            <a href="//www.mi.com/service/buy/buytime/">{{$article->title}}</a>
 
         </div>
     </div>
@@ -29,7 +29,7 @@
                                 <ul class="uc-nav-list">
                                 @foreach($article->helpCate->helpArticle()->where('status',1)->get() as $k=>$v)
                                     <li @if($v->id==$article->id) class="cur" @endif>
-                                        <a href="/help/article?id={{$v->id}}" >{{$v->title}}</a>
+                                        <a href="/help/article/{{$v->id}}" >{{$v->title}}</a>
                                     </li>
                                 @endforeach
                                 </ul>
@@ -43,7 +43,7 @@
             <div class="span16">
                 <div class="content" id="serviceListCon">
                 <style>
-                .service-right img{max-width: 856px;}
+                .service-right img{max-width: 100%;height:auto;}
                 </style>
                     <div class="service-right">
                         <h2>{{$article->title}}</h2>

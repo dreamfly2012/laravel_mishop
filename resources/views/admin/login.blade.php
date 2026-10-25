@@ -36,7 +36,7 @@
         <h1>登陆</h1>
         <div class="mws-login-lock"><i class="icon-lock"></i></div>
         <div id="mws-login-form">
-            <form class="mws-form" action="/admin/login/login" method="post">
+            <form class="mws-form" action="/admin/login" method="post">
                 <div class="mws-form-row">
                     <div class="mws-form-item">
                         <input type="text" name="username" class="mws-login-username required" placeholder="用户名">

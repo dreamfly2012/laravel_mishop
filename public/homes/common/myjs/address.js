@@ -160,7 +160,6 @@ var inpData = {};
         }else{
             inpData.province = '';
         }
-        // console.log(inpData);
 
     })
     //市选择
@@ -174,7 +173,6 @@ var inpData = {};
         }else{
             inpData.city = '';
         }
-        // console.log(inpData);
     })
     //区县选择
     $('#J_modalEditAddress').on('change','#J_county',function(){
@@ -184,7 +182,6 @@ var inpData = {};
         }else{
             inpData.country = '';
         }
-        // console.log(inpData);
     })
 
 
@@ -312,8 +309,7 @@ var inpData = {};
         parents = _self.parents('.J_addressItem');
         aid = parents.data('address_id');
         $.ajax({
-            url:'/address/del',
-            data:{id:aid},
+            url:'/address/delete/'+aid,
             type:'GET',
             dataType:'json',
             success:function(data){

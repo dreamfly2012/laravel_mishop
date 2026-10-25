@@ -1,12 +1,11 @@
 $(function(){
-	/*更多按钮*/
-	$(".filter-list-wrap .J_filterToggle").click(function(){
-		$(this).parents(".filter-list-wrap").toggleClass("filter-list-wrap-toggled");
-	});
-	
+	/*更多按钮: 展开/收起已统一到 mobile.js (响应式行为), 此处不再绑定, 避免同一点击切换两次*/
+
 	/*商品单品鼠标经过小图*/
 	$("body").on("mouseenter",".thumb-list li",function(){
-		var dataconfig=eval('(' + $(this).attr("data-config") + ')');
+		var conf=$(this).attr("data-config");
+		if(!conf) return;
+		var dataconfig=eval('(' + conf + ')');
 		$(this).parents(".goods-item").find(".figure-img img").attr("src",dataconfig.figure);
 		$(this).addClass("active").siblings().removeClass("active");
 	});
@@ -28,8 +27,8 @@ $(function(){
 	
 	
 	
-	/*为你推荐 轮播切换*/
-	$("#J_renovateWrap").slide({
+	/*为你推荐 轮播切换 (搜索页未引 SuperSlide, 无插件时跳过)*/
+	$.fn.slide && $("#J_renovateWrap").slide({
 		titCell:".xm-pagers",
 		mainCell:".xm-carousel-list",
 		titOnClassName:"pager-active",

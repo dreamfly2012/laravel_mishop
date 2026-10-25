@@ -24,8 +24,8 @@ $(function(){
         skuid = item.find('.J_cartGoods').data('sid');
         cartid = item.data('cid');
         $.ajax({
-            url:'/cart/delcart',
-            data:{id:cartid,'listItem':listItem},
+            url:'/cart/delete/'+cartid,
+            data:{'listItem':listItem},
             dataType:'json',
             success:function(data){
                 if(data.status==0){
@@ -55,10 +55,8 @@ $(function(){
         //改变全选状态
 
         $(this).toggleClass('icon-checkbox-selected');
-        // console.log(this);
         $('.J_itemCheckbox').each(function(i,v){
             var sid = $(v).parents('.J_cartGoods').data('sid');
-            // console.log(i+'-'+i,sid,$.inArray(sid,listItem));
             if($(v).hasClass('icon-checkbox-selected')){
                 ($.inArray(sid,listItem)<0)&&listItem.push(sid)
             }else{
@@ -99,7 +97,6 @@ $(function(){
             listItem = [];
             $('#J_cartTotalPrice').html('0.0');
         }
-        // console.log(listItem)
         
     });
     //改变小计
@@ -159,9 +156,9 @@ $(function(){
 
         //发送一个ajax请求
         $.ajax({
-            url:'/cart/addproduct',
+            url:'/cart/add/'+$skuid,
             type:'GET',
-            data:{id:$skuid,num:$num,"listItem":listItem},
+            data:{num:$num,"listItem":listItem},
             dataType:"json",
             success: function(data){
                 if(method!='minus'&&data.status==1){

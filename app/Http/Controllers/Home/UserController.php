@@ -52,9 +52,16 @@ class UserController extends Controller
     public function getPackin(Request $request)
     {
         $uid = session('uid');
-        $id = $request->input('id');
-       
-         $order = Order::findOrFail($id);
+
+        // 新地址 /user/packin/{id}; 旧地址 /user/packin?id=xx 301 到新格式
+        $id = $request->route('id');
+
+        if (is_null($id) && $request->filled('id')) {
+            return redirect('/user/packin/'.(int)$request->input('id'), 301);
+        }
+
+         // 仅允许本人、且处于待收货(2)的订单确认收货
+         $order = Order::where('user_id',$uid)->where('order_status',2)->findOrFail($id);
          $order->order_status = 3;
          if($order->save()){
             return redirect('/user/comment?filter=1');
@@ -83,7 +90,7 @@ class UserController extends Controller
                         </div>';
                 $action ='
                         <td class="order-actions">
-                            <a class="btn btn-small btn-primary" href="/order/pay?id='.$val->id.'" target="_blank">立即支付</a>
+                            <a class="btn btn-small btn-primary" href="/order/pay/'.$val->id.'" target="_blank">立即支付</a>
                             <!--<a class="btn btn-small btn-line-gray" href="user/orderView?id='.$val->id.'">订单详情</a>-->
                         </td>';
             }elseif($status == 6) {
@@ -118,7 +125,7 @@ class UserController extends Controller
                 $action ='
                         <td class="order-actions">
                             <!--<a class="btn btn-small btn-line-gray" href="user/orderView?id='.$val->id.'">订单详情</a>-->';
-                $action .= $status==2? '<a class="btn btn-small  btn-primary" href="/user/packin?id='.$val->id.'">确认收货</a>':''; 
+                $action .= $status==2? '<a class="btn btn-small  btn-primary" href="/user/packin/'.$val->id.'">确认收货</a>':''; 
                 if($status==3){
                     
                 }               
@@ -134,10 +141,10 @@ class UserController extends Controller
                                         <p class="caption-info">
                                             '.date('Y年m月d日 H:i',strtotime($val->created_at)).'
                                             <span class="sep">|</span>
-                                            '.$val->consignee.'
+                                            '.htmlspecialchars($val->consignee, ENT_QUOTES).'
                                             <span class="sep">|</span>
                                             订单号：
-                                            <a href="/user/orderView?num='.$val->order_num.'">'.$val->order_num.'</a>
+                                            <a href="/user/order">'.$val->order_num.'</a>
                                             <span class="sep">|</span>
                                             在线支付
                                         </p>
@@ -159,11 +166,11 @@ class UserController extends Controller
                                             
                                             $str .='<li>
                                                 <div class="figure figure-thumb">
-                                                    <a href="/detail?id='.$v->sku->good->id.'" target="_blank">
+                                                    <a href="/detail/'.$v->sku->good->id.'" target="_blank">
                                                         <img src="'.$v->sku->img.'" width="80" height="80" alt="'.$v->goods_name.'"></a>
                                                 </div>
                                                 <p class="name">
-                                                    <a target="_blank" href="/detail?id='.$v->sku->good->id.'">'.$v->goods_name.'</a>
+                                                    <a target="_blank" href="/detail/'.$v->sku->good->id.'">'.$v->goods_name.'</a>
                                                 </p>
                                                 <p class="price">'.$v->price.'元 × '.$v->num.'</p>
                                             </li>';
@@ -223,7 +230,6 @@ class UserController extends Controller
             $goodsInfo[] = $temp;
         }
         //判断商品是否已经评价过了
-        // dd($goodsInfo);
         $goodsCmtNo = [];//没评论过的订单信息
         $goodsCmtYes = [];//评论过的订单信息        
         foreach ($goodsInfo as $k => $v) {
@@ -258,8 +264,6 @@ class UserController extends Controller
 
             }
         }
-        // dd($goodsCmtNo);
-        // dd($goodsCmtYes);
         return view('home.user.comment',[
             'request'=>$request,
             'goodsNo'=>$goodsNo,
@@ -273,9 +277,9 @@ class UserController extends Controller
      */
     public function getLogout(Request $request)
     {
-        session(['uid'=>null]);
-        $request->session()->flush();
-        return back();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        return redirect('/');
     }
 
     /**

@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Hash;
 use Gregwar\Captcha\CaptchaBuilder;
 use Gregwar\Captcha\PhraseBuilder;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
 
 
 class LoginController extends Controller
@@ -40,6 +42,7 @@ class LoginController extends Controller
 
         $upass = $user->password;
         if(Hash::check($password,$upass)){
+            $request->session()->regenerate();
             session(['uid'=>$user->id]);
             session(['pic'=>$user->pic]);
             return redirect('/');
@@ -67,6 +70,9 @@ class LoginController extends Controller
         $user->status = 1;
         $user->username = $data['username'];
         $user->email = $data['email'];
+        $user->phone = '';
+        $user->level = '0';
+        $user->pic = config('app.upload_image_dir').'user.png';
 
         if($user->save()){
             return redirect('/login');
@@ -84,40 +90,44 @@ class LoginController extends Controller
         $username = $request->input('username');
         $email = $request->input('email');
 
+        // 统一错误信息, 避免用户名枚举
+        $fail = function () {
+            return back()->with('error','用户名或邮箱不正确!');
+        };
+
         $user = User::where('username',$username)->first();
-
-        if(empty($user)){
-            return back()->with('error','无效的用户名!');
+        if(empty($user) || $user->email !== $email){
+            return $fail();
         }
 
-        $e = $user->email;
+        // 生成一次性重置令牌 (15 分钟有效, 用完即焚), 不再把 uid 写进 session
+        $token = Str::random(40);
+        Cache::put('pwd_reset_'.$token, $user->id, now()->addMinutes(15));
 
-//        var_dump(env('MAIL_USERNAME'));
-//        var_dump(config('app.APP_NAME'));
-
-//        return view('emails.forget',['user'=> $user]);
-        if($email==$e){
-            //发邮件
-            $request->session()->put('uid',$user->id);
-            return redirect('/login/password')->with('mark','1');
-            //模态框弹出 a邮箱 跳转login
-        }
-        return back()->with('error','邮箱不匹配!');
+        return redirect('/login/repass?token='.$token);
     }
-    public function getRepass()
+    public function getRepass(Request $request)
     {
-        return view('home.repass');
+        $token = $request->query('token');
+        if(empty($token) || !Cache::has('pwd_reset_'.$token)){
+            abort(403, '重置链接已失效,请重新申请');
+        }
+        return view('home.repass', ['token' => $token]);
     }
     public function postRepass(Request $request)
     {
+        $token = $request->input('token');
+        $uid = $token ? Cache::get('pwd_reset_'.$token) : null;
+        if(empty($uid)){
+            return redirect('/login/password')->with('error','重置链接已失效,请重新申请');
+        }
+
         $data = $request->all();
-        $id = session('uid');
-
         if($data['confirm_password']==$data['password']){
-
-            $user = User::find($id);
+            $user = User::find($uid);
             $user->password = Hash::make($data['password']);
             $user->save();
+            Cache::forget('pwd_reset_'.$token);
         }
         return redirect('/login');
     }
@@ -141,6 +151,7 @@ class LoginController extends Controller
         // 高对比配色：浅底深字（设置了颜色后，库会跳过反色/边缘检测等后期效果）
         $builder->setBackgroundColor(250, 250, 250)
             ->setTextColor(40, 40, 40)
+            ->setLineColor(190, 190, 190) // 干扰线用浅灰，别盖住字
             ->setMaxAngle(4)          // 字符倾斜角度，默认 8
             ->setMaxOffset(2)         // 字符上下偏移，默认 5
             ->setMaxBehindLines(3)    // 文字背后的干扰线

@@ -13,7 +13,7 @@
     <div class="mws-panel-inner-wrap">
         <div class="mws-panel-body no-padding">
             <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper" role="grid">
-            <form action="/admin/indexPage/navlist" method="get">
+            <form action="/admin/index-page/nav-list" method="get">
                 <div id="DataTables_Table_0_length" class="dataTables_length">
                     <label>
                         显示
@@ -53,10 +53,10 @@
                             <td><input class="ibutton" cid="{{$v->id}}" type="checkbox" {{$v->status? 'checked':''}}></td>
                             <td>
                                 <span class="btn-group">
-                                    <a href="/admin/indexPage/navedit?id={{$v->id}}" class="btn btn-small">
+                                    <a href="/admin/index-page/nav-edit/{{$v->id}}" class="btn btn-small">
                                         <i class="icon-pencil"></i>
                                     </a>
-                                    <a href="/admin/indexPage/navdel?id={{$v->id}}" class="btn btn-small">
+                                    <a href="/admin/index-page/nav-delete/{{$v->id}}" class="btn btn-small">
                                         <i class="icon-trash"></i>
                                     </a>
                                 </span>
@@ -204,9 +204,9 @@
             status = status?1:0;
             var $self = $(this);
             $.ajax({
-                url:'/admin/indexPage/ajaxnavupdate',
+                url:'/admin/index-page/nav-update/'+$id,
                 type:'GET',
-                data:{'id':$id,status:status},
+                data:{status:status},
                 success: function(data){
                     if( data==='0' )
                     {
@@ -222,7 +222,7 @@
         });
         $('#j-createJs').on('click',function(){
             $.ajax({
-                url:'/admin/indexPage/ajaxcreate',
+                url:'/admin/index-page/create',
                 type:'GET',
                 success: function(data){
                     if(data){

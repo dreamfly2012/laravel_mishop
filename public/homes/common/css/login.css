@@ -2130,3 +2130,115 @@ body {
 		display: block
 	}
 }
+
+/* =========================================================
+   注册页窄屏适配 (n-frame 原为 960px 定宽)
+   ========================================================= */
+@media only screen and (max-width: 770px) {
+    .register_wrap {
+        overflow-x: hidden;
+    }
+
+    .n-frame,
+    .n-frame.device-frame,
+    .n-frame.reg_frame {
+        width: auto !important;
+        max-width: 100%;
+        margin: 0 12px !important;
+        padding-left: 0;
+        padding-right: 0;
+        box-sizing: border-box;
+    }
+
+    .title-item,
+    .title-big {
+        width: auto !important;
+        text-align: center;
+    }
+
+    .regbox,
+    .mauto,
+    .phone_step1,
+    .inputbg {
+        width: auto !important;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
+    .inputbg .labelbox {
+        width: 100% !important;
+        box-sizing: border-box;
+    }
+
+    .inputbg input {
+        width: 100% !important;
+        box-sizing: border-box;
+    }
+
+    .inputcode {
+        display: block !important;
+    }
+
+    .inputcode .labelbox.label-code {
+        width: auto !important;
+        float: left;
+        max-width: 100%;
+    }
+
+    .inputcode .code {
+        width: 100% !important;
+        box-sizing: border-box;
+    }
+
+    .icode_image {
+        float: right;
+        width: 110px !important;
+        height: 40px !important;
+        margin-top: 1px;
+    }
+
+    .btn332,
+    .btn_reg_1 {
+        width: 100% !important;
+        box-sizing: border-box;
+    }
+
+    .fixed_bot {
+        padding: 16px 0 0;
+    }
+
+    .regbox .trig {
+        text-align: center;
+        padding-top: 14px;
+    }
+
+    .n-footer {
+        padding: 20px 12px;
+    }
+
+    .n-footer .nf-intro,
+    .n-footer p {
+        font-size: 12px;
+        line-height: 1.8;
+        text-align: center;
+    }
+
+    .n-footer .nf-intro span {
+        word-break: break-all;
+    }
+}
+
+
+@media only screen and (max-width: 1256px) {
+    .n-frame,
+    .n-frame.device-frame,
+    .n-frame.reg_frame {
+        width: auto !important;
+        max-width: 960px;
+        margin: 0 12px !important;
+        padding-left: 20px;
+        padding-right: 20px;
+        box-sizing: border-box;
+    }
+}
+

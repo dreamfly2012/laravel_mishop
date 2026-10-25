@@ -20,16 +20,10 @@ class CartController extends Controller
      * sku-id对应的键值是一个数组 0=>代表购物车商品数量
      * sku-id对应的键值是一个数组 0=>代表商品的good-id
      */
-    public function getInit(){
-        session(['uid'=>null]);
-        session(['cart'=>null]);
-        session(['listItem'=>null]);
-    }
     public function index()
     {
         //获取用户id
         // session(['uid'=>1]);
-        // dd(session()->all());
         //判断用户是否登录
         $uid = session('uid');
 
@@ -94,7 +88,6 @@ class CartController extends Controller
                     $carts[] = $sku;
                 }
                 //获取购物车中商品的id
-                // dd($carts[0]->price);
                 foreach($carts as $k=>$v){
                     $listItem .= $v->id.',';
                     
@@ -140,11 +133,17 @@ class CartController extends Controller
     {
         //获取用户id
         $uid = session('uid');
-        
+
+        // 新地址 /cart/add/{id}; 旧地址 /cart/addproduct?id=xx 仍可用
+        $skuId = $request->route('id') ?? $request->input('id');
+
         //查找商品
-        $sku = Sku::select('stock','id','price')->find($request->input('id'));
+        $sku = Sku::select('stock','id','price')->find($skuId);
+        // 数量校验: 必须为 1~库存 的整数
+        $num = (int)$request->input('num');
+        if($num < 1) $num = 1;
         //判断是超过库存
-        if($sku->stock < $request->input('num')){
+        if($sku->stock < $num){
             $this->data['status'] = 1;//超过最大库存
             $this->data['msg'] = '已超过最大库存量'.$sku->stock.'件';
             $this->data['total'] = $sku->price;//价格小计
@@ -170,7 +169,7 @@ class CartController extends Controller
             $skus = $request->input('listItem');
             // 
             $alltotal = 0;
-            if($skus&&in_array($request->input('id'),$skus)){
+            if($skus&&in_array($skuId,$skus)){
                 
                 return $this->totalPriceBySession($skus,$alltotal,$sku,$request);
 
@@ -191,14 +190,23 @@ class CartController extends Controller
         }
 
 
-        //跟新购物车表
-        $cart = Cart::where('user_id',$uid)->where('sku_id',$request->input('id'))->first();
-        $cart->goods_num = $request->input('num');
+        //跟新购物车表 (不存在则新建, 避免空指针)
+        $cart = Cart::where('user_id',$uid)->where('sku_id',$skuId)->first();
+        if(empty($cart)){
+            $cart = new Cart;
+            $cart->user_id = $uid;
+            $cart->sku_id = $skuId;
+            $cart->goods_id = $sku->good_id;
+            $cart->goods_name = $sku->title;
+            $cart->goods_attr = $sku->color;
+            $cart->goods_num = 0;
+        }
+        $cart->goods_num = $num;
         if($cart->save()){
             //判断 该商品是否被选中 选中就更新总价
             $skus = $request->input('listItem');
             $alltotal = 0;
-            if($skus&&in_array($request->input('id'),$skus)){
+            if($skus&&in_array($skuId,$skus)){
                 //计算总价
                 return $this->totalPriceByDB($uid,$skus,$alltotal,$sku,$cart,$request);
 
@@ -380,10 +388,13 @@ class CartController extends Controller
 
     public function getDelcart(Request $request)
     {
+        // 新地址 /cart/delete/{id}; 旧地址 /cart/delcart?id=xx 仍可用
+        $skuId = $request->route('id') ?? $request->input('id');
+
         //删除指定项listItem
         $listItem = $request->input('listItem');
-        if(in_array($request->input('id'),$listItem)){
-            $key = array_search($request->input('id'),$listItem);
+        if(in_array($skuId,$listItem)){
+            $key = array_search($skuId,$listItem);
             unset($listItem[$key]);
 
         }
@@ -396,8 +407,8 @@ class CartController extends Controller
         if(!empty(session('cart')))
         {
 
-            $request->session()->forget('cart.'.$request->input('id'));
-            // session(['cart'.$request->input('id')=>null]);
+            $request->session()->forget('cart.'.$skuId);
+            // session(['cart'.$skuId=>null]);
             \session()->save();
             $this->data['status'] = 0;
             $this->data['msg'] = 'ok';
@@ -405,9 +416,9 @@ class CartController extends Controller
             return response()->json($this->data);
         }
 
-        // $skuid = $request->input('id');
+        // $skuid = $skuId;
         // $cart = Cart::where('user_id',session('uid'))->where('sku_id',$skuid)->first();
-        $cart = Cart::find($request->input('id'));
+        $cart = Cart::find($skuId);
        
         if(empty($cart)){
             $this->data['status'] = 1;
@@ -427,97 +438,127 @@ class CartController extends Controller
     }
 
     /**
-     * 加入购物车操作
+     * 当前购物车里的商品总件数 (游客查 session, 已登录查 carts 表)
+     * 供顶栏购物车角标使用
      */
-    public function ajaxAddCart(Request $request){
-
-        //判断是否登录
+    public static function cartCount()
+    {
         $uid = session('uid');
-        $sku = Sku::where('good_id',$request->input('good_id'))->where('price',$request->input('sku_price'))->where('color',$request->input('sku_color'))->where('attr',$request->input('sku_attr'))->first();
-        //$sku = Sku::find($request->input('id'));
-        //未登录情况将购物车信息加入到session中
-        if(empty($uid)){
-            //先判断是否存在
-            if(empty(session('cart')[$sku->id])){
-//         dd(11);
-                $request->session()->push('cart.'.($sku->id), $sku->id);//0 代表 id
-                $request->session()->push('cart.'.($sku->id), $request->input('num'));//1 代表 num
-                $request->session()->push('cart.'.($sku->id), $sku->good_id);//2 代表 gid good_id
-                //保存修改过的session值
-                session()->save();
-                $this->data['status'] = 0;
-                $this->data['msg'] = 'ok';
-                return response()->json($this->data);
-            }else{
-//                dd(444);
-                //修改session值
-                $num = session('cart')[$sku->id][1];
-                $request->session()->forget('cart.'.$sku->id);
-                $request->session()->push('cart.'.($sku->id), $sku->id);//0 代表 id
-                $request->session()->push('cart.'.($sku->id),  $num+$request->input('num'));//1 代表 num
-                $request->session()->push('cart.'.($sku->id), $sku->good_id);
-                
-                //保存修改过的session值
-                session()->save();
-                $this->data['status'] = 0;
-                $this->data['msg'] = 'ok';
-                return response()->json($this->data);
-
-            }
-
-
+        if (!empty($uid)) {
+            return (int)Cart::where('user_id', $uid)->sum('goods_num');
         }
-
-        //dd($sku);
-        //已经登录 将数据插入到数据库中
-//        dd($uid);
-        if(!empty($uid)){
-//            dd(1);
-            //查看购物车数据中是否存在该商品
-            $cart = Cart::where('user_id',$uid)->where('sku_id',$sku->id)->first();
-            //处理不存在该商品的情况
-            if(empty($cart)){
-
-                $info = new Cart;
-                $info->user_id = $uid;
-                $info->sku_id = $sku->id;
-                $info->goods_id = $request->input('good_id');
-                $info->goods_name = $sku->title;
-                $info->goods_attr = $sku->color;
-                $info->goods_num = $request->input('num');
-                if($info->save()){
-                    $this->data['status'] = 0;
-                    $this->data['msg'] = 'ok';
-                    return response()->json($this->data);
-                }else{
-                    $this->data['status'] = 1;
-                    $this->data['msg'] = '操作失败,请重试';
-                    return response()->json($this->data);
-                }
-
-            }else{
-
-                $cart->goods_num = $cart->goods_num + (int)$request->input('num');
-                if($cart->save()){
-                    $this->data['status'] = 0;
-                    $this->data['msg'] = 'ok';
-                    return response()->json($this->data);
-                }else{
-                    $this->data['status'] = 1;
-                    $this->data['msg'] = '操作失败,请重试';
-                    return response()->json($this->data);
-                }
-            }
-
+        $count = 0;
+        foreach ((array)session('cart') as $item) {
+            $count += (int)($item[1] ?? 0);
         }
-
+        return $count;
     }
 
     /**
-     * 添加数据到购物车的操作
+     * 加入购物车操作
+     * 参数: good_id 必传; num 可选默认 1;
+     *       sku_price/sku_color/sku_attr 详情页传, 用于精确定位 SKU;
+     *       列表页只传 good_id, 自动取该商品第一个 SKU
      */
-    private function addToCart($request)
+    public function ajaxAddCart(Request $request)
     {
-        
+
+        //判断是否登录
+        $uid = session('uid');
+        $goodId = (int)$request->input('good_id');
+        $num = (int)$request->input('num') ?: 1;
+
+        if ($goodId <= 0) {
+            return response()->json(['status' => 2, 'msg' => '缺少商品参数']);
+        }
+
+        //定位 SKU:
+        // - 详情页表单始终提交 sku_price/sku_color/sku_attr (含空串), 三者选全才允许加购;
+        //   选全后精确匹配, 匹配不到说明规格已下架;
+        // - 列表页/搜索页无规格选择, 只传 good_id, 自动取该商品第一个 SKU。
+        $isDetail = $request->hasAny(['sku_price', 'sku_color', 'sku_attr']);
+
+        if ($isDetail) {
+            $wheres = [
+                'price' => trim((string)$request->input('sku_price')),
+                'color' => trim((string)$request->input('sku_color')),
+                'attr'  => trim((string)$request->input('sku_attr')),
+            ];
+            if (in_array('', $wheres, true)) {
+                return response()->json(['status' => 3, 'msg' => '请先选择商品的版本/颜色']);
+            }
+            $sku = Sku::where('good_id', $goodId)
+                ->where('price', $wheres['price'])
+                ->where('color', $wheres['color'])
+                ->where('attr', $wheres['attr'])
+                ->first();
+            if (empty($sku)) {
+                return response()->json(['status' => 3, 'msg' => '该商品规格已下架, 请刷新页面重新选择']);
+            }
+        } else {
+            $sku = Sku::where('good_id', $goodId)->orderBy('id', 'asc')->first();
+            if (empty($sku)) {
+                return response()->json(['status' => 3, 'msg' => '查无该商品信息']);
+            }
+        }
+
+        //购物车里该 SKU 已有数量 (游客在 session, 已登录在数据库)
+        $inCart = 0;
+        $cart = null;
+        if (!empty($uid)) {
+            $cart = Cart::where('user_id', $uid)->where('sku_id', $sku->id)->first();
+            if (!empty($cart)) {
+                $inCart = (int)$cart->goods_num;
+            }
+        } else {
+            $sessionCart = (array)session('cart');
+            $inCart = isset($sessionCart[$sku->id][1]) ? (int)$sessionCart[$sku->id][1] : 0;
+        }
+
+        //库存校验: 已有数量 + 本次数量不能超过库存
+        if ($inCart + $num > (int)$sku->stock) {
+            return response()->json([
+                'status' => 1,
+                'msg'    => '已超过最大库存量' . $sku->stock . '件',
+                'count'  => self::cartCount(),
+            ]);
+        }
+
+        //未登录情况将购物车信息加入到session中
+        if (empty($uid)) {
+            session([
+                'cart.' . $sku->id => [$sku->id, $inCart + $num, $sku->good_id],//0 代表 id, 1 代表 num, 2 代表 gid
+            ]);
+            //保存修改过的session值
+            session()->save();
+            return response()->json([
+                'status' => 0,
+                'msg'    => 'ok',
+                'count'  => self::cartCount(),
+            ]);
+        }
+
+        //已经登录 将数据插入到数据库中
+        if (empty($cart)) {
+            $cart = new Cart;
+            $cart->user_id = $uid;
+            $cart->sku_id = $sku->id;
+            $cart->goods_id = $sku->good_id;
+            $cart->goods_name = $sku->title;
+            $cart->goods_attr = $sku->color;
+        }
+        $cart->goods_num = $inCart + $num;
+        if ($cart->save()) {
+            return response()->json([
+                'status' => 0,
+                'msg'    => 'ok',
+                'count'  => self::cartCount(),
+            ]);
+        }
+        return response()->json([
+            'status' => 1,
+            'msg'    => '操作失败,请重试',
+            'count'  => self::cartCount(),
+        ]);
     }
 }

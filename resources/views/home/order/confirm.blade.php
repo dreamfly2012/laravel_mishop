@@ -1,7 +1,7 @@
 @extends('layout.index')
 @section('css')
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <link rel="icon" href="//s01.mifile.cn/favicon.ico" type="image/x-icon" />
+    <link rel="icon" href="/cdn/s01.mifile.cn/favicon.ico" type="image/x-icon" />
     <link rel="stylesheet" href="/homes/common/css/base.min.css" />
     <link rel="stylesheet" href="/homes/common/css/checkout.min.css" />
     <link rel="stylesheet" href="/homes/common/css/address-edit.min.css" />
@@ -11,7 +11,7 @@
     <div class="site-header site-mini-header">
         <div class="container">
             <div class="header-logo">
-                <a class="logo " href="//www.mi.com/index.html" title="小米官网"></a>
+                <a class="logo " href="/" title="小米官网"></a>
             </div>
             <div class="header-title" id="J_miniHeaderTitle"><h2>确认支付</h2></div>
         </div>
@@ -86,7 +86,7 @@
                     <div class="section-header clearfix">
                         <h3 class="title">商品</h3>
                         <div class="more">
-                            <a href="/cart/">
+                            <a href="/cart">
                                 返回购物车 <i class="iconfont"></i>
                             </a>
                         </div>
@@ -99,7 +99,7 @@
                                 <div class="col col-img">
                                     <img src="{{$v->sku->img}}" width="30" height="30"></div>
                                 <div class="col col-name">
-                                    <a href="//item.mi.com/1161000034.html" target="_blank" data-stat-id="5df49956c521d07e">{{$v->goods_name}}</a>
+                                    <a href="/detail/{{$v->goods_id}}" target="_blank" data-stat-id="5df49956c521d07e">{{$v->goods_name}}</a>
                                 </div>
                                 <div class="col col-price">{{$v->price}}元 x {{$v->goods_num}}</div>
                                 <div class="col col-status">
@@ -351,7 +351,6 @@ var orderData = {
     packTime:0
 }
 </script>
-<script src="/homes/common/myjs/jquery.min.js"></script>
 <script src="/homes/common/js/address_all.js"></script>     
 <script src="/homes/common/myjs/fnmodel.js"></script>    
 <script src="/homes/common/myjs/order.js"></script>       

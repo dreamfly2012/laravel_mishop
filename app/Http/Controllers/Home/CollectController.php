@@ -27,7 +27,8 @@ class CollectController extends Controller
             ]);
         }
 
-        $goodId = (int) $request->input('id');
+        // 新地址 /collect/{id}; 旧地址 /collect?id=xx 仍可用
+        $goodId = (int) ($request->route('id') ?? $request->input('id'));
         $good = Good::where('status', 1)->find($goodId);
         if (!$good) {
             return response()->json(['status' => 2, 'info' => '商品不存在']);
@@ -38,7 +39,8 @@ class CollectController extends Controller
         if ($collect) {
             $collect->delete();
 
-            return response()->json(['status' => 0, 'info' => '已取消收藏']);
+            // collected: 操作后该商品是否仍处于已收藏状态, 前端据此切换按钮样式
+            return response()->json(['status' => 0, 'info' => '已取消收藏', 'collected' => false]);
         }
 
         $collect = new Collect();
@@ -46,6 +48,6 @@ class CollectController extends Controller
         $collect->good_id = $goodId;
         $collect->save();
 
-        return response()->json(['status' => 0, 'info' => '收藏成功']);
+        return response()->json(['status' => 0, 'info' => '收藏成功', 'collected' => true]);
     }
 }

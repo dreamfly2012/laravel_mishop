@@ -26,8 +26,8 @@
                         <td>{{$user['status']}}</td>
                         <td>
                             <span class="btn-group">
-                                <a href="/admin/user/edit?id={{$user['id']}}" class="btn btn-small"><i class="icon-pencil"></i></a>
-                                <a href="/admin/user/delete?id={{$user['id']}}" class="btn btn-small"><i class="icon-trash"></i></a>
+                                <a href="/admin/user/edit/{{$user['id']}}" class="btn btn-small"><i class="icon-pencil"></i></a>
+                                <a href="/admin/user/delete/{{$user['id']}}" class="btn btn-small"><i class="icon-trash"></i></a>
                             </span>
                         </td>
 

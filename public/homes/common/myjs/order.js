@@ -158,7 +158,6 @@ var inpData = {};
         }else{
             inpData.province = '';
         }
-        // console.log(inpData);
 
     })
     //市选择
@@ -172,7 +171,6 @@ var inpData = {};
         }else{
             inpData.city = '';
         }
-        // console.log(inpData);
     })
     //区县选择
     $('#J_modalEditAddress').on('change','#J_county',function(){
@@ -182,7 +180,6 @@ var inpData = {};
         }else{
             inpData.country = '';
         }
-        // console.log(inpData);
     })
 
 
@@ -336,7 +333,7 @@ var inpData = {};
             dataType:'json',
             success: function(data){
                 if(data.status ==0){
-                    window.location.href = '/order/pay?id='+data.msg;
+                    window.location.href = '/order/pay/'+data.msg;
                 }else{
                     alert(data.msg);
                 }

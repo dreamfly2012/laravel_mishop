@@ -333,23 +333,33 @@ function addToCartResponse(result)
 }
 
 /* *
- * 添加商品到收藏夹
+ * 添加商品到收藏夹 (btn 为触发点击的收藏按钮, 用于同步收藏状态样式)
  */
-function collect(goodsId)
+function collect(goodsId, btn)
 {
-  Ajax.call('/collect', 'id=' + goodsId, collectResponse, 'GET', 'JSON');
+  Ajax.call('/collect/' + goodsId, '', function (result)
+  {
+    collectResponse(result, btn);
+  }, 'GET', 'JSON');
 }
 
 /* *
- * 处理收藏商品的反馈信息
+ * 处理收藏商品的反馈信息: 同步按钮收藏态并提醒
  */
-function collectResponse(result)
+function collectResponse(result, btn)
 {
   if (result && result.redirect)
   {
     alert(result.info);
     window.location.href = result.redirect;
     return;
+  }
+  // 收藏/取消成功: 按钮加 liked 态(橙色实心), 文案随之切换
+  if (result && result.status == 0 && btn)
+  {
+    var $btn = $(btn);
+    $btn.toggleClass('liked', !!result.collected);
+    $btn.find('span').text(result.collected ? '已收藏' : '收藏');
   }
   alert(result && result.info ? result.info : '操作失败, 请稍后再试');
 }

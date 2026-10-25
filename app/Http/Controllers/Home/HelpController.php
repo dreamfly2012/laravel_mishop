@@ -14,7 +14,14 @@ class HelpController extends Controller
     //
     public function getArticle(Request $request)
     {
-        $article = HelpArticle::where('status',1)->findOrFail($request->input('id'));
+        // 新地址 /help/article/{id}; 旧地址 /help/article?id=xx 301 到新格式
+        $id = $request->route('id');
+
+        if (is_null($id) && $request->filled('id')) {
+            return redirect('/help/article/'.(int)$request->input('id'), 301);
+        }
+
+        $article = HelpArticle::where('status',1)->findOrFail($id);
         if(empty($article)){
             abort(404);
         }

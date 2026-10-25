@@ -19,7 +19,6 @@ class AddressController extends Controller
      */
     public function getAdd(Request $request)
     {
-        // dd($request->all());
         //获取登录用户的uid
         $uid = session('uid');
         $address = new Address;
@@ -45,9 +44,16 @@ class AddressController extends Controller
 
     public function getDel(Request $request)
     {
-        $ad_id = $request->input('id');
+        // 新地址 /address/delete/{id}; 旧地址 /address/del?id=xx 仍可用
+        $ad_id = $request->route('id') ?? $request->input('id');
+        $uid = session('uid');
+        $address = Address::where('user_id',$uid)->find($ad_id);
 
-        $address = Address::find($ad_id);
+        if(empty($address)){
+            $this->data['status'] = 1;
+            $this->data['msg'] = '地址不存在';
+            return response()->json($this->data);
+        }
 
         if($address->delete()){
             $this->data['status'] = 0;

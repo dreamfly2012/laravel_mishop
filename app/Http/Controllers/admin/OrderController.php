@@ -42,8 +42,7 @@ class OrderController extends Controller
     */
    public function getEdit(Request $request)
    {
-        $id = $request->input('id');
-        $order = Order::findOrFail($id);
+        $order = Order::findOrFail($request->route('id'));
         return view('admin.order.edit',[
                 'order'=>$order,
                 'status'=>$this->status
@@ -70,8 +69,7 @@ class OrderController extends Controller
     */
    public function getDetail(Request $request)
    {
-        $id = $request->input('id');
-        $order = Order::findOrFail($id);
+        $order = Order::findOrFail($request->route('id'));
 
         return view('admin.order.detail',[
                 'order'=>$order,

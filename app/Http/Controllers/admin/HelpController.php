@@ -83,7 +83,7 @@ class HelpController extends Controller
             if($num>0){
                 $str = str_repeat('　　',$num);
             }
-            $str .= '<i class="icon-minus j-slide" style="width:16px;height: 16px;line-height:16px;text-align: center;border-radius:3px;color:#fff;background: #06A798;cursor:pointer;"></i><a href="/admin/help/article?id='.$v->id.'" style="color:#333">';
+            $str .= '<i class="icon-minus j-slide" style="width:16px;height: 16px;line-height:16px;text-align: center;border-radius:3px;color:#fff;background: #06A798;cursor:pointer;"></i><a href="/admin/help/article/'.$v->id.'" style="color:#333">';
             $v->name = $str.$v->name.'</a>';
         }
 
@@ -98,7 +98,7 @@ class HelpController extends Controller
      */
     public function getAjaxcatestatus(Request $request)
     {
-        $nav = HelpCate::find($request->input('id'));
+        $nav = HelpCate::find($request->route('id'));
         $nav->status = $request->input('status');
         if($nav->save()){
             return response('0');
@@ -111,7 +111,7 @@ class HelpController extends Controller
      */
     public function getAjaxcateshow(Request $request)
     {
-        $nav = HelpCate::find($request->input('id'));
+        $nav = HelpCate::find($request->route('id'));
         $nav->show = $request->input('status');
         if($nav->save()){
             return response('0');
@@ -125,7 +125,7 @@ class HelpController extends Controller
     public function getCateedit(Request $request)
     {
         //通过id查找数据信息
-        $info = HelpCate::find($request->input('id'));
+        $info = HelpCate::find($request->route('id'));
         //
         $cates = $this->getAllCates();
       
@@ -185,7 +185,7 @@ class HelpController extends Controller
     public function getCatedel(Request $request)
     {
         //通过id查找数据信息
-        $info = HelpCate::find($request->input('id'));
+        $info = HelpCate::find($request->route('id'));
         //
         if($info->delete()){
             return back()->with('info','删除成功');
@@ -245,7 +245,7 @@ class HelpController extends Controller
         $info->status = $request->input('status');
         //将数据插入到数据库中
         if($info->save()){
-            return redirect('admin/help/article?id='.$request->input('pid'))->with('info','添加成功');
+            return redirect('/admin/help/article/'.$request->input('pid'))->with('info','添加成功');
         }else{
             return back()->with('error','添加失败');
         }
@@ -255,7 +255,7 @@ class HelpController extends Controller
      */
     public function getArticle(Request $request)
     {
-        $id = $request->input('id');
+        $id = $request->route('pid');
         if($id&&!is_numeric($id)){
             abort(404);
         }
@@ -271,7 +271,7 @@ class HelpController extends Controller
         $paginator = new \Illuminate\Pagination\LengthAwarePaginator($articles, count($articles),$request->input('num',10));
         // $paginator = $paginator->setPath(route('admin.help.article'));
         //设置分页href路径
-        $paginator=$paginator->withPath('/admin/help/article');
+        $paginator=$paginator->withPath('/admin/help/article'.($id ? '/'.$id : ''));
         //数组截数据 显示
         $pageout=array_slice($articles, ($page-1)*$pagesize,$pagesize);
 
@@ -344,7 +344,7 @@ class HelpController extends Controller
      */
     public function getAjaxstatus(Request $request)
     {
-        $nav = HelpArticle::find($request->input('id'));
+        $nav = HelpArticle::find($request->route('id'));
         $nav->status = $request->input('status');
         if($nav->save()){
             return response('0');
@@ -358,7 +358,7 @@ class HelpController extends Controller
     public function getArtedit(Request $request)
     {
         $cates = $this->getAllCates();
-        $article = HelpArticle::findOrFail($request->input('id'));
+        $article = HelpArticle::findOrFail($request->route('id'));
         return view('admin.help.artedit',[
             'cates'=>$cates,
             'article'=>$article,
@@ -376,7 +376,7 @@ class HelpController extends Controller
         $info->status = $request->input('status');
         //将数据插入到数据库中
         if($info->save()){
-            return redirect('admin/help/article?id='.$request->input('pid'))->with('info','修改成功');
+            return redirect('/admin/help/article/'.$request->input('pid'))->with('info','修改成功');
         }else{
             return back()->with('error','修改失败');
         }
@@ -387,7 +387,7 @@ class HelpController extends Controller
     public function getArtdel(Request $request)
     {
         //通过id查找数据信息
-        $info = HelpArticle::find($request->input('id'));
+        $info = HelpArticle::find($request->route('id'));
         //
         if($info->delete()){
             return back()->with('info','删除成功');

@@ -1,191 +1,160 @@
 <!DOCTYPE html>
-<!-- saved from url=(0051)http://order.mi.com/buy/checkout?r=80242.1469596349 -->
-<html lang="zh-CN" xml:lang="zh-CN"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<html lang="zh-CN" xml:lang="zh-CN">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=Edge">
-
-    <title>回帖</title>
-    <meta name="viewport" content="width=1226">
-
-    <link type="text/css" rel="stylesheet" href="/homes/common/demo/css/application.css">
-    <script type="text/javascript" src="/homes/common/demo/js/jquery.min.js"></script>
-    <script type="text/javascript" src="/homes/common/lib/jquery.raty.min.js"></script>
-    <link href="/homes/common//favicon.ico" rel="shortcut icon" type="image/x-icon">
-
-    <link rel="shortcut icon" href="http://s01.mifile.cn/favicon.ico" type="image/x-icon">
-    <link rel="icon" href="http://s01.mifile.cn/favicon.ico" type="image/x-icon">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>发表评价 - 小米商城</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="/homes/common/css/base.min.css">
-    <link rel="stylesheet" type="text/css" href="/homes/common/css/checkout.min.css">
-    <style type="text/css" media="screen">
-        body{
-            font-family: Tahoma;
+    {{-- 本页是独立模板(不继承 layout.index), 需要自带 jQuery --}}
+    <script src="/homes/common/myjs/jquery.min.js"></script>
+    <script src="/homes/common/lib/jquery.raty.min.js"></script>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            min-width: 0;
+            background: #f5f5f5;
+            color: #333;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+                "Hiragino Sans GB", "Microsoft Yahei", "Helvetica Neue", Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
         }
-        textarea{
-            width:450px;
-            height: 210px;
-            float:right;
-            margin: 15px 100px;
-            padding: 20px;
+        .cm-header { background: #fff; border-bottom: 1px solid #e0e0e0; }
+        .cm-header-inner {
+            max-width: 900px; margin: 0 auto; padding: 0 16px; height: 56px;
+            display: flex; align-items: center;
         }
-        .goods-item{
-            width:220px;
-            height: 210px;
-            float:left;
-            margin: 15px ;
+        .cm-header a { color: #757575; text-decoration: none; font-size: 14px; }
+        .cm-header a:hover { color: #ff6700; }
+        .cm-header .cm-title { margin: 0 auto; font-size: 16px; font-weight: 400; color: #333; }
+        .cm-header .cm-back { width: 64px; }
+        .cm-header .cm-placeholder { width: 64px; }
+        .cm-wrap { max-width: 900px; margin: 24px auto 60px; padding: 0 16px; }
+        .cm-card {
+            background: #fff; border-radius: 8px; padding: 28px 32px 32px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, .06);
+        }
+        .cm-card h2 { margin: 0 0 20px; font-size: 20px; font-weight: 400; }
+        .cm-goods {
+            display: flex; align-items: center; gap: 16px;
+            padding-bottom: 20px; border-bottom: 1px solid #f0f0f0;
+        }
+        .cm-goods-img {
+            width: 96px; height: 96px; flex: 0 0 96px; border: 1px solid #f0f0f0;
+            border-radius: 6px; overflow: hidden; display: flex;
+            align-items: center; justify-content: center;
+        }
+        .cm-goods-img img { max-width: 100%; max-height: 100%; display: block; }
+        .cm-goods-info { min-width: 0; }
+        .cm-goods-name {
+            margin: 0 0 8px; font-size: 16px; line-height: 1.5;
+            overflow: hidden; text-overflow: ellipsis; display: -webkit-box;
+            -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+        }
+        .cm-goods-name a { color: #333; text-decoration: none; }
+        .cm-goods-name a:hover { color: #ff6700; }
+        .cm-goods-meta { margin: 0; font-size: 13px; line-height: 1.9; color: #757575; }
+        .cm-goods-meta b { color: #ff6700; font-weight: 400; }
+        .cm-rate-row {
+            display: flex; align-items: center; flex-wrap: wrap; gap: 10px;
+            padding: 22px 0 6px;
+        }
+        .cm-rate-row .cm-label { font-size: 14px; color: #757575; }
+        .cm-rate-row .hint { font-size: 14px; color: #ff6700; }
+        .cm-textarea {
+            display: block; width: 100%; min-height: 180px; margin: 12px 0 0;
+            padding: 14px 16px; border: 1px solid #e0e0e0; border-radius: 6px;
+            font-size: 14px; line-height: 1.8; color: #333; resize: vertical;
+            outline: none; transition: border-color .2s;
+        }
+        .cm-textarea:focus { border-color: #ff6700; }
+        .cm-bar { display: flex; justify-content: flex-end; margin-top: 24px; }
+        .cm-bar .btn {
+            min-width: 160px; height: 44px; line-height: 44px; padding: 0 28px;
+            border: 0; border-radius: 4px; background: #ff6700; color: #fff;
+            font-size: 15px; cursor: pointer; transition: background-color .2s;
+        }
+        .cm-bar .btn:hover { background: #e55c00; }
 
-        }
-        p:hover{
-            color: #ff4f31;
-        }
-        p{
-            font-weight: 800;
-            font-size: 15px;
-        }
-        .title{
-            float: left;
-        }
-        .demo{
-            float: right;
-            margin-top: 50px;
-            margin-right: 250px;
-        }
-        .clear{
-            clear: both;
-
+        @media (max-width: 767px) {
+            .cm-header-inner { height: 50px; padding: 0 12px; }
+            .cm-wrap { margin: 12px auto 40px; padding: 0 10px; }
+            .cm-card { padding: 20px 16px 22px; border-radius: 6px; }
+            .cm-card h2 { font-size: 17px; margin-bottom: 16px; }
+            .cm-goods { gap: 12px; padding-bottom: 16px; }
+            .cm-goods-img { width: 76px; height: 76px; flex-basis: 76px; }
+            .cm-goods-name { font-size: 14px; }
+            .cm-goods-meta { font-size: 12px; }
+            .cm-rate-row { padding: 16px 0 4px; }
+            .cm-textarea { min-height: 140px; font-size: 13px; }
+            .cm-bar { margin-top: 18px; }
+            .cm-bar .btn { width: 100%; min-width: 0; }
         }
     </style>
-
 </head>
 <body>
-<form action="/comment/insert" method="post">
-    <div class="section section-goods">
-        <div class="section-header clearfix">
-            <h3 class="title">亲,留个评价吧!</h3>
-        </div>
-        <div>
-            <h2 class="title"><a href="" >{{$sku->title}}</a></h2>
-            <div class="demo">
+<div class="cm-header">
+    <div class="cm-header-inner">
+        <a class="cm-back" href="/user/order">&lt; 返回</a>
+        <h1 class="cm-title">发表评价</h1>
+        <span class="cm-placeholder"></span>
+    </div>
+</div>
+<div class="cm-wrap">
+    <form action="/comment/insert" method="post">
+        {{ csrf_field() }}
+        <input type="hidden" name="good_id" value="{{ $sku->good->id }}">
+        <input type="hidden" name="order_id" value="{{ $order_id }}">
+        <div class="cm-card">
+            <h2>亲，留个评价吧！</h2>
+            <div class="cm-goods">
+                <div class="cm-goods-img">
+                    <a href="/detail/{{ $sku->good_id }}">
+                        <img src="{{ $sku->img }}" alt="">
+                    </a>
+                </div>
+                <div class="cm-goods-info">
+                    <p class="cm-goods-name">
+                        <a href="/detail/{{ $sku->good_id }}">{{ $sku->title }}</a>
+                    </p>
+                    <p class="cm-goods-meta">
+                        价格：<b>{{ $sku->price }} 元</b><br>
+                        型号：{{ $sku->attr }}<br>
+                        颜色：{{ $sku->color }}
+                    </p>
+                </div>
+            </div>
+            <div class="cm-rate-row">
+                <span class="cm-label">商品评分</span>
                 <div id="precision-demo" class="target-demo"></div>
                 <div id="precision-hint" class="hint"></div>
             </div>
-        </div>
-        <div class="clear"></div>
-        <div class="section-body clearfix">
-            <div class="goods-item">
-                <div class="figure figure-img"><a href="//item.mi.com/1152000033.html?cfrom=list" data-stat-id="06967af09ddae9f3" >
-                    <img src="{{$sku->img}}" width="200" height="200" alt=""></a>
-                </div>
+            <textarea class="cm-textarea" name="content" placeholder="外形如何，使用如何，写下您的感受吧..."></textarea>
+            <div class="cm-bar">
+                <button type="submit" class="btn" id="J_checkoutToPay">发表评论</button>
             </div>
-
-            <div class="goods-item">
-                <p class="desc">价格: {{$sku->price}}</p>
-                <p class="desc">型号: </p><p>{{$sku->attr}}</p>
-                <p class="desc">颜色: {{$sku->color}}</p>
-            </div>
-
-            <ul class="goods-list clearfix" id="J_goodsList">
-                <textarea name="content" title="">外形如何,使用如何,写下您的感受吧...</textarea>
-
-            </ul>
         </div>
-    </div>
-    <input type="hidden" name="good_id" value="{{$sku->good->id}}">
-    {{csrf_field()}}
-    <div class="section-bar clearfix">
-        <div class="fr">
-            <input type="hidden" name="order_id" value="{{$order_id}}">
-            <button href="" class="btn btn-primary" id="J_checkoutToPay" data-stat-id="4773f7ffc10003b8" >发表评论
-            </button>
-        </div>
-    </div>
-</form>
-</body>
-
+    </form>
+</div>
 <script type="text/javascript">
-    $(function() {
-
-
-
-        $.fn.raty.defaults.path = '/homes/common/lib/img';
-
+    $(function () {
+        $.fn.raty.defaults.path = '/homes/common/demo/img';
         $('#precision-demo').raty({
-            path      : '/homes/common/demo/img',
-            cancelOff : 'cancel-off-big.png',
-            cancelOn  : 'cancel-on-big.png',
-            size      : 24,
-            starHalf  : 'star-half-big.png',
-            starOff   : 'star-off-big.png',
-            starOn    : 'star-on-big.png',
-            target    : '#precision-hint',
-            cancel    : true,
+            path: '/homes/common/demo/img',
+            cancelOff: 'cancel-off-big.png',
+            cancelOn: 'cancel-on-big.png',
+            size: 24,
+            starHalf: 'star-half-big.png',
+            starOff: 'star-off-big.png',
+            starOn: 'star-on-big.png',
+            target: '#precision-hint',
+            cancel: true,
             targetKeep: true,
-
-            precision : true
-        });
-
-        $('#space-demo').raty({ space: false });
-
-        $('#single-demo').raty({ single: true });
-
-        $('#function-demo').raty({
-            path      : 'demo/img',
-            cancelOff : 'cancel-off-big.png',
-            cancelOn  : 'cancel-on-big.png',
-            size      : 24,
-            starHalf  : 'star-half-big.png',
-            starOff   : 'star-off-big.png',
-            starOn    : 'star-on-big.png',
-            target    : '#function-hint',
-            cancel    : true,
-            targetKeep: true,
-            precision : true,
-            click: function(score, evt) {
-                alert('ID: ' + $(this).attr('id') + "\nscore: " + score + "\nevent: " + evt.type);
-            }
-        });
-
-        $('#score-action').on('click', function() {
-            $('#function-demo').raty('score', $('#score-function-demo').val());
-        });
-
-        $('#click-action').on('click', function() {
-            $('#function-demo').raty('click', $('#click-function-demo').val());
-        });
-
-        $('#readOnly-action').on('click', function() {
-            var isReadOnly = $('#readOnly-function-demo').val() === 'true' ? true : false;
-
-            $('#function-demo').raty('readOnly', isReadOnly);
-        });
-
-        $('#cancel-action').on('click', function() {
-            var isTrigger = $('#cancel-function-trigger-demo').val() === 'true' ? true : false;
-
-            $('#function-demo').raty('cancel', isTrigger);
-        });
-
-        $('#reload-action').on('click', function() {
-            $('#function-demo').raty('reload');
-        });
-
-        $('#score-get-action').on('click', function() {
-            alert('score: ' + $('#function-demo').raty('score'));
-        });
-
-        $('#score-set-action').on('click', function() {
-            var score = $('#score-set-function-demo').val();
-
-            $('#function-demo').raty('score', score);
-        });
-
-        $('#set-action').on('click', function() {
-            var options = $('#set-function-demo').val(),
-                    command = "$('#function-demo').raty('set', " + options + ");";
-
-            eval(command);
-        });
-
-        $('#destroy-action').on('click', function() {
-            $('#function-demo').raty('destroy');
+            precision: true
         });
     });
 </script>
+</body>
+</html>

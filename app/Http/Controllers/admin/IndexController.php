@@ -30,7 +30,7 @@ class IndexController extends Controller
         $nav->sku_id_group = $request->input('sku_id_group');
         $nav->status = 1;
         if($nav->save()){
-            return redirect('/admin/indexPage/navlist')->with('info','添加成功');
+            return redirect('/admin/index-page/nav-list')->with('info','添加成功');
         }else{
             return back()->with('error','添加失败');
         }
@@ -52,7 +52,7 @@ class IndexController extends Controller
      */
     public function getAjaxnavupdate(Request $request)
     {
-        $nav = Navigation::find($request->input('id'));
+        $nav = Navigation::find($request->route('id'));
         $nav->status = $request->input('status');
         if($nav->save()){
             return response('0');
@@ -64,7 +64,7 @@ class IndexController extends Controller
      * 显示导航栏目编辑页面
      */
     public function getNavedit(Request $request){
-        $nav = Navigation::find($request->input('id'));
+        $nav = Navigation::find($request->route('id'));
         $sku_id_group = explode(',',$nav->sku_id_group);
         $data = $this->skuData($sku_id_group);
 
@@ -98,7 +98,7 @@ class IndexController extends Controller
             $nav->nav_url = $request->input('nav_url');
         }
         if($nav->save()){
-            return redirect('/admin/indexPage/navlist')->with('info','修改成功');
+            return redirect('/admin/index-page/nav-list')->with('info','修改成功');
         }else{
             return back()->with('error','修改失败');
         }
@@ -109,7 +109,7 @@ class IndexController extends Controller
      */
     public function getNavdel(Request $request)
     {
-        $nav = Navigation::findOrFail($request->input('id'));
+        $nav = Navigation::findOrFail($request->route('id'));
 
         if($nav->delete()){
             return back()->with('info','删除成功');

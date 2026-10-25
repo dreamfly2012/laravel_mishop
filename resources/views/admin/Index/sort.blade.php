@@ -18,7 +18,7 @@
             </ul>
         </div>
         @endif
-        <form id="cate" class="mws-form" action="/admin/indexPage/staradd" method="post">
+        <form id="cate" class="mws-form" action="/admin/index-page/star-add" method="post">
             <div class="mws-form-inline">
                 <div class="mws-form-row">
                     <span class="btn btn-primary" id="create">生成分类导航js文件</span>
@@ -37,7 +37,7 @@
 $(function(){
     $('#create').on('click',function(){
         $.ajax({
-            url:'/admin/indexPage/sortnav',
+            url:'/admin/index-page/sort-nav',
             type:'GET',
             success:function(data){
                 if(!!data){

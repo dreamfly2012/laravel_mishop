@@ -21,7 +21,7 @@
         <div class="topbar-info" id="J_userInfo">
             <a  rel="nofollow" class="link" href="/login" data-needlogin="true">登录</a>
             <span class="sep">|</span>
-            <a  rel="nofollow" class="link" href="/register" >注册</a>
+            <a  rel="nofollow" class="link" href="/login/register" >注册</a>
         </div>
         <?php
         }else{
@@ -35,7 +35,7 @@
                     </a>
                     <ul class="user-menu" style="display: none;">
                         <li>
-                            <a rel="nofollow" href="/portal">个人中心</a>
+                            <a rel="nofollow" href="/user/order">个人中心</a>
                         </li>
                         <li>
                             <a rel="nofollow" href="/user/comment" target="_blank">评价晒单</a>
@@ -49,7 +49,7 @@
                     </ul>
                 </span>
             <span class="sep">|</span>
-            <a rel="nofollow" class="link link-order" href="/user/order/" target="_blank">我的订单</a>
+            <a rel="nofollow" class="link link-order" href="/user/order" target="_blank">我的订单</a>
         </div>
         <?php } ?>
     </div>
@@ -67,7 +67,7 @@
             <h2>您的购物车还是空的！</h2>
             <p class="login-desc">登录后将显示您之前加入的商品</p>
             <a href="#" class="btn btn-primary btn-login" id="J_loginBtn">立即登录</a>
-            <a href="//list.mi.com/0" class="btn btn-primary btn-shoping J_goShoping" >马上去购物</a>
+            <a href="/list" class="btn btn-primary btn-shoping J_goShoping" >马上去购物</a>
         </div>
         @endif
         @if(!empty($carts[0]))
@@ -93,13 +93,13 @@
                                 <div class="col col-check"> <i class="iconfont icon-checkbox icon-checkbox-selected J_itemCheckbox">√</i>
                                 </div>
                                 <div class="col col-img">
-                                    <a href="//item.mi.com/1151900011.html" target="_blank">
+                                    <a href="/detail/{{ $v->gid ?? $v->good_id }}" target="_blank">
                                         <img alt="" src="{{$v->img}}" width="80" height="80"></a>
                                 </div>
                                 <div class="col col-name">
                                     <div class="tags"></div>
                                     <h3 class="name">
-                                        <a href="//item.mi.com/1151900011.html" target="_blank">{{$v->title.$v->attr}}</a>
+                                        <a href="/detail/{{ $v->gid ?? $v->good_id }}" target="_blank">{{$v->title.$v->attr}}</a>
                                     </h3>
                                 </div>
                                 <div class="col col-price">{{number_format($v->price,2)}}元</div>
@@ -135,13 +135,13 @@
                                 <div class="col col-check"> <i class="iconfont icon-checkbox icon-checkbox-selected J_itemCheckbox">√</i>
                                 </div>
                                 <div class="col col-img">
-                                    <a href="//item.mi.com/1151900011.html" target="_blank">
+                                    <a href="/detail/{{ $v->gid ?? $v->good_id }}" target="_blank">
                                         <img alt="" src="{{$v->img}}" width="80" height="80"></a>
                                 </div>
                                 <div class="col col-name">
                                     <div class="tags"></div>
                                     <h3 class="name">
-                                        <a href="//item.mi.com/1151900011.html" target="_blank">{{$v->title.$v->attr}}</a>
+                                        <a href="/detail/{{ $v->gid ?? $v->good_id }}" target="_blank">{{$v->title.$v->attr}}</a>
                                     </h3>
                                 </div>
                                 <div class="col col-price">{{number_format($v->price,2)}}元</div>
@@ -214,11 +214,11 @@
                     <li class="J_xm-recommend-list span4">
                         <dl>
                             <dt>
-                                <a href="//item.mi.com/1154000008.html" >
+                                <a href="/detail/{{$v->id}}" >
                                     <img src="{{$v->showImg}}" width="120" alt="米家小白智能摄像机"></a>
                             </dt>
                             <dd class="xm-recommend-name">
-                                <a href="//item.mi.com/1154000008.html">{{$v->skus()->first()->title}}</a>
+                                <a href="/detail/{{$v->id}}">{{$v->skus()->first()->title}}</a>
                             </dd>
                             <dd class="xm-recommend-price">{{$v->skus()->first()->price}}元</dd>
                             <dd class="xm-recommend-tips">
@@ -239,7 +239,6 @@
 <script>
     var listItem = [{{$listItem}}];
 </script>
-<script src="/homes/common/myjs/jquery.min.js"></script>
 <script src="/homes/common/myjs/cart.js"></script>
 <script>
     //鼠标滑过显示个人中心菜单效果

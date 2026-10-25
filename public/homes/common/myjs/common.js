@@ -99,7 +99,6 @@ $(function(){
         //     var str = '';
         //     for(var i=0;i<arr.length;i++){
         //         str += '<li data-key="小米手机5"><a href="#">小米手机5<span class="result">约有11件</span></a></li>';
-        //         console.log(i)
         //     }
         //     $cont.html(str);
         // }
@@ -113,14 +112,14 @@ $(function(){
                 var temp = '<div class="site-category"> <ul id="J_categoryList" class="site-category-list clearfix">';
                 for(var i=0;i<arr.length;i++){
                     temp+= '<li class="category-item">';
-                        temp+= '<a class="title" href="/list?id='+arr[i]['data']['id']+'">';
+                        temp+= '<a class="title" href="/list/'+arr[i]['data']['id']+'">';
                             temp+=arr[i]['data']['title']+' <i class="iconfont"></i>';
                         temp+= '</a>';
                         temp+= '<div class="children clearfix children-col-2"  style="width:'+265*Math.ceil(arr[i]['child'].length/7)+'px;">';
                             temp+= '<ul class="children-list children-list-col children-col-1">';
                                 for(var j=0;j<arr[i]['child'].length;j++){
                                     temp+= '<li class="star-goods">';
-                                        temp+= '<a class="link" href="/list?id='+arr[i]['child'][j]["id"]+'">';
+                                        temp+= '<a class="link" href="/list/'+arr[i]['child'][j]["id"]+'">';
                                             temp+= '<img class="thumb" src="'+arr[i]['child'][j]["img"]+'" width="40" height="40" alt="">';
                                             temp+= '<span class="text">'+arr[i]['child'][j]["title"]+'</span>';
                                         temp+= '</a>';
@@ -147,7 +146,6 @@ $(function(){
                 $(this).removeClass('category-item-active');
             }
         });
-        //console.log($('#J_navCategory').find('.link-category').css('visibility'));
         //分类导航划过显示
         $('#J_navCategory').on({
             mouseenter:function(){
@@ -205,12 +203,12 @@ $(function(){
                                 for(var j=0;j<navData[i]['info'].length;j++){
                                     str +='<li class="first">';
                                         str +='<div class="figure figure-thumb">';
-                                            str +='<a href="/detail?id='+navData[i]['info'][j]['good_id']+'">';
+                                            str +='<a href="/detail/'+navData[i]['info'][j]['good_id']+'">';
                                                 str +='<img src="'+navData[i]['info'][j]['img']+'" width="160" height="110">';
                                             str +='</a>';
                                         str +='</div>';
                                         str +='<div class="title">';
-                                            str +='<a href="/detail?id='+navData[i]['info'][j]['good_id']+'">'+navData[i]['info'][j]['title']+'</a>';
+                                            str +='<a href="/detail/'+navData[i]['info'][j]['good_id']+'">'+navData[i]['info'][j]['title']+'</a>';
                                         str +='</div>';
                                         str +='<p class="price">'+navData[i]['info'][j]['price']+'</p>';
                                     str +='</li>';
@@ -238,3 +236,15 @@ $(function(){
 
     
 });
+
+//同步顶栏购物车数量角标 (加购成功后由 ajax 回调调用联动样式)
+function syncCartNum(count)
+{
+    if (typeof count === "undefined" || count === null) return;
+    $(".J_cartNum").text(count > 0 ? "（" + count + "）" : "");
+    if (count > 0) {
+        //图标切换为"有货"购物车样式 (同 MI.updateMiniCart)
+        $("#J_miniCartTrigger").addClass("topbar-cart-filled")
+            .find(".cart-mini .iconfont").html("&#xe60d;");
+    }
+}

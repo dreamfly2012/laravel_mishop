@@ -1,10 +1,10 @@
 @extends('layout.index')
 @section('title','去付款')
 @section('css')
-    <link rel="shortcut icon" href="//s01.mifile.cn/favicon.ico" type="image/x-icon" />
-    <link rel="icon" href="//s01.mifile.cn/favicon.ico" type="image/x-icon" />
-    <link rel="stylesheet" href="//s01.mifile.cn/css/base.min.css?v2016d22" />
-    <link rel="stylesheet" type="text/css" href="//s01.mifile.cn/css/pay-confirm.min.css?v=2016063001" />
+    <link rel="shortcut icon" href="/cdn/s01.mifile.cn/favicon.ico" type="image/x-icon" />
+    <link rel="icon" href="/cdn/s01.mifile.cn/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="/cdn/s01.mifile.cn/css/base.min.css" />
+    <link rel="stylesheet" type="text/css" href="/cdn/s01.mifile.cn/css/pay-confirm.min.css" />
 @endsection
 @section('header')
     <div class="site-header site-mini-header">

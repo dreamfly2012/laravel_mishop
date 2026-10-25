@@ -66,7 +66,7 @@ class CateController extends Controller
 
     public function getEdit(Request $request)
     {
-        $cate = Cate::where('id',$request->only('id'))->first();
+        $cate = Cate::where('id', $request->route('id'))->first();
         $cates = Cate::all();
         return view('admin.cate.update',['cate'=>$cate,'title'=>'添加用户','cates'=>$cates]);
     }
@@ -101,48 +101,11 @@ class CateController extends Controller
 
     public function getDelete(Request $request)
     {
-        $id = $request->input('id');
+        $id = $request->route('id');
         if(Cate::where('id',$id)->first()->delete()){
             return back()->with('info','删除成功!');
         }else{
             return back()->with('error','删除失败!');
         }
     }
-
-    /*
-     * $arr = [
-            '男装'=>[
-                '衬衫'=>['韩版衬衫'=>[], '秦版衬衫' => [],],
-                '西裤'=>[],
-                '平角内裤'=>[],
-            ],
-            '女装'=>[
-                '裙子'=>['连衣裙'=>[],'拖地长裙'=>[],'超短裙'=>[]],
-                '鞋'=>['凉鞋'=>[],'高跟鞋'=>[],'一字带'=>[]]
-            ],
-            '童装'=>[],
-            '老人装'=>[]
-        ];
-     *
-     * */
-    
-    public  static function getCate($pid)
-    {
-        $array = [];
-        $cates = Cate::where('pid',$pid)->get();
-
-        foreach ($cates as $key => $cate) {
-            $array[$cate->name] = self::getCate($cate->id);
-        }
-        return($array);
-
-    }
-    public function getTest()
-    {
-        dd(self::getCate(0));
-    }
-    
-    
-
-
 }

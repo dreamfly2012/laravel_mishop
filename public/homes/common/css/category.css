@@ -408,6 +408,18 @@
 	opacity: 1;
 	filter: alpha(opacity=100)\9;
 }
+/* 已收藏态: 爱心变橙常亮, 文案始终可见 */
+.goods-list-box .goods-item .actions .btn-like.liked {
+	opacity: 1;
+	filter: alpha(opacity=100)\9;
+}
+.goods-list-box .goods-item .actions .btn-like.liked i {
+	color: #ff6700;
+}
+.goods-list-box .goods-item .actions .btn-like.liked span {
+	opacity: 1;
+	filter: alpha(opacity=100)\9;
+}
 .goods-list-box .goods-item .flags {
 	position: absolute;
 	left: 0;

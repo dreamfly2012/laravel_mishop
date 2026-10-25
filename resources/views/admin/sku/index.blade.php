@@ -30,8 +30,8 @@
                         <td>{{$sku['status']}}</td>
                         <td>
                             <span class="btn-group">
-                                <a href="/admin/sku/edit?id={{$sku['id']}}" class="btn btn-small" title="修改"><i class="icon-pencil"></i></a>
-                                <a href="/admin/sku/delete?id={{$sku['id']}}" class="btn btn-small"  title="删除"><i class="icon-trash"></i></a>
+                                <a href="/admin/sku/edit/{{$sku['id']}}" class="btn btn-small" title="修改"><i class="icon-pencil"></i></a>
+                                <a href="/admin/sku/delete/{{$sku['id']}}" class="btn btn-small"  title="删除"><i class="icon-trash"></i></a>
                             </span>
                         </td>
 

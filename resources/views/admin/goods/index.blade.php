@@ -28,9 +28,9 @@
                         <td>{{$good['status']}}</td>
                         <td>
                             <span class="btn-group">
-                                <a href="/admin/sku/add?id={{$good['id']}}" class="btn btn-small" title="查看详细信息"><i class="icon-search"></i></a>
-                                <a href="/admin/good/edit?id={{$good['id']}}" class="btn btn-small" title="修改"><i class="icon-pencil"></i></a>
-                                <a href="/admin/good/delete?id={{$good['id']}}" class="btn btn-small"  title="删除"><i class="icon-trash"></i></a>
+                                <a href="/admin/sku/add/{{$good['id']}}" class="btn btn-small" title="查看详细信息"><i class="icon-search"></i></a>
+                                <a href="/admin/good/edit/{{$good['id']}}" class="btn btn-small" title="修改"><i class="icon-pencil"></i></a>
+                                <a href="/admin/good/delete/{{$good['id']}}" class="btn btn-small"  title="删除"><i class="icon-trash"></i></a>
                             </span>
                         </td>
 

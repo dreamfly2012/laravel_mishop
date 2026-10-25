@@ -26,8 +26,8 @@
                         <td>{{$cate['status']}}</td>
                         <td>
                             <span class="btn-group">
-                                <a href="/admin/cate/edit?id={{$cate['id']}}" class="btn btn-small"><i class="icon-pencil"></i></a>
-                                <a href="/admin/cate/delete?id={{$cate['id']}}" class="btn btn-small"><i class="icon-trash"></i></a>
+                                <a href="/admin/cate/edit/{{$cate['id']}}" class="btn btn-small"><i class="icon-pencil"></i></a>
+                                <a href="/admin/cate/delete/{{$cate['id']}}" class="btn btn-small"><i class="icon-trash"></i></a>
                             </span>
                         </td>
 

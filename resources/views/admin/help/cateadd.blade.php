@@ -17,7 +17,7 @@
             </ul>
         </div>
         @endif
-        <form id="cate" class="mws-form" action="/admin/help/cateadd" method="post">
+        <form id="cate" class="mws-form" action="/admin/help/cate-add" method="post">
             <div class="mws-form-inline">
                 <div class="mws-form-row">
                     <label class="mws-form-label">帮助栏目名称</label>

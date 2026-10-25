@@ -66,10 +66,10 @@
                             </td>
                             <td>
                                 <span class="btn-group">
-                                    <a href="/admin/order/edit?id={{$v->id}}" class="btn btn-small" title="编辑订单状态">
+                                    <a href="/admin/order/edit/{{$v->id}}" class="btn btn-small" title="编辑订单状态">
                                         <i class="icon-pencil"></i>
                                     </a>
-                                    <a href="/admin/order/detail?id={{$v->id}}" class="btn btn-small" title="查看订单详情">
+                                    <a href="/admin/order/detail/{{$v->id}}" class="btn btn-small" title="查看订单详情">
                                         <i class="icon-zoom-in"></i>
                                     </a>
                                 </span>
@@ -214,9 +214,9 @@
             status = status?1:0;
             var $self = $(this);
             $.ajax({
-                url:'/admin/indexPage/ajaxnavupdate',
+                url:'/admin/index-page/nav-update/'+$id,
                 type:'GET',
-                data:{'id':$id,status:status},
+                data:{status:status},
                 success: function(data){
                     if( data==='0' )
                     {
@@ -232,7 +232,7 @@
         });
         $('#j-createJs').on('click',function(){
             $.ajax({
-                url:'/admin/indexPage/ajaxcreate',
+                url:'/admin/index-page/create',
                 type:'GET',
                 success: function(data){
                     if(data){

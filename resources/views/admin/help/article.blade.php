@@ -5,13 +5,13 @@
     <div class="mws-panel-header">
         <span> <i class="icon-table"></i>
             帮助栏目文章列表
-            <a href="/admin/help/add" class="btn btn-danger pull-right" >添加帮助栏目文章</a>
+            <a href="/admin/help/add{{$request->route('pid') ? '/'.$request->route('pid') : ''}}" class="btn btn-danger pull-right" >添加帮助栏目文章</a>
         </span>
     </div>
     <div class="mws-panel-inner-wrap">
         <div class="mws-panel-body no-padding">
             <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper" role="grid">
-            <form action="/admin/help/article" method="get">
+            <form action="/admin/help/article{{$request->route('pid') ? '/'.$request->route('pid') : ''}}" method="get">
                 <div id="DataTables_Table_0_length" class="dataTables_length">
                     <label>
                         显示
@@ -54,10 +54,10 @@
                             <td>{{$v->created_at}}</td>
                             <td>
                                 <span class="btn-group">
-                                    <a href="/admin/help/artedit?id={{$v->id}}" class="btn btn-small" title="编辑栏目分类">
+                                    <a href="/admin/help/article-edit/{{$v->id}}" class="btn btn-small" title="编辑栏目分类">
                                         <i class="icon-pencil"></i>
                                     </a>
-                                    <a href="/admin/help/artdel?id={{$v->id}}" class="btn btn-small" title="删除栏目分类">
+                                    <a href="/admin/help/article-delete/{{$v->id}}" class="btn btn-small" title="删除栏目分类">
                                         <i class="icon-trash"></i>
                                     </a>
                                 </span>
@@ -204,9 +204,9 @@
             status = status?1:0;
             var $self = $(this);
             $.ajax({
-                url:'/admin/help/ajaxstatus',
+                url:'/admin/help/article-status/'+$id,
                 type:'GET',
-                data:{'id':$id,status:status},
+                data:{status:status},
                 success: function(data){
                     if( data==='0' )
                     {

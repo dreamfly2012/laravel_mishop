@@ -10,7 +10,7 @@
 
     <div class="breadcrumbs">
         <div class="container">
-            <a href='//www.mi.com/index.html'>首页</a>
+            <a href='/'>首页</a>
             <span class="sep">&gt;</span>
             <span>收货地址</span>
         </div>
@@ -28,11 +28,11 @@
                             <div class="box-bd">
                                 <ul class="uc-nav-list">
                                     <li>
-                                        <a href="/user/order/">我的订单</a>
+                                        <a href="/user/order">我的订单</a>
                                     </li>
                                     
                                     <li>
-                                        <a href="/user/comment/">评价晒单</a>
+                                        <a href="/user/comment">评价晒单</a>
                                     </li>
                                     
                                 </ul>
@@ -111,7 +111,6 @@
 @endsection
 
 @section('js')
-<script src="/homes/common/myjs/jquery.min.js"></script>
 <script src="/homes/common/js/address_all.js"></script>        
 <script src="/homes/common/myjs/address.js"></script>
 <script src="/data/indexNav.js"></script>

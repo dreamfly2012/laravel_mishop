@@ -7,16 +7,21 @@
         img{
             width: auto;
         }
+        /* 版本按钮: 名称可能很长("标准版全网通 2GB内存+16GB容量"), 定高 45px 会截断, 改为最小高度 + 居中换行 */
         .attr{
-            line-height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1.4;
             width:150px;
+            min-height: 45px;
+            padding: 6px 8px;
             float: left;
-            display: block;
             border: 1px solid #e0e0e0;
             text-align: center;
-            height: 45px;
+            box-sizing: border-box;
             margin: 10px;
-            overflow: hidden;
+            word-break: break-word;
         }
         .attr:hover{
             border-color: #ff6700;
@@ -39,10 +44,31 @@
         .select{
             border-color: #ff6700;
         }
+        /*加入购物车成功弹窗 (同列表页 .add_ok 风格, 该页未引 style.css 故独立声明)*/
+        .add-cart-mask{
+            position:fixed; top:0; left:0; width:100%; height:100%;
+            background:#000; opacity:.5; z-index:9998; display:none;
+        }
+        .add_ok{
+            display:none; background:#fff; padding:40px 0; text-align:center;
+            width:480px; border:3px solid #f70; border-radius:10px;
+            position:fixed; top:30%; left:50%; margin-left:-240px; z-index:9999;
+        }
+        .add_ok .tip{ font-size:30px; margin-bottom:20px; color:#333; }
+        .add_ok .tip i{
+            font-size:60px; color:#6dc415; vertical-align:-10px; margin-right:15px;
+            font-style:normal; font-family:Arial;
+        }
+        .add_ok .go a{ font-size:18px; text-decoration:none; }
+        .add_ok .go a.back{ color:#f70; margin-right:60px; }
+        .add_ok .go a.btn{
+            padding:10px 45px 12px; border:1px solid #eb7207;
+            background-color:#f70; color:#fff; border-radius:3px;
+        }
     </style>
     <script src="/homes/common/js/jquery-1.9.1.min.js"></script>
-    <link rel="shortcut icon" href="http://s01.mifile.cn/favicon.ico" type="image/x-icon" />
-    <link rel="icon" href="http://s01.mifile.cn/favicon.ico" type="image/x-icon" />
+    <link rel="shortcut icon" href="/cdn/s01.mifile.cn/favicon.ico" type="image/x-icon" />
+    <link rel="icon" href="/cdn/s01.mifile.cn/favicon.ico" type="image/x-icon" />
     <link rel="stylesheet" href="/homes/common/css/base.min.css" />
     <link rel="stylesheet" type="text/css" href="/homes/common/css/goods-detail.min.css" />
 @endsection
@@ -135,7 +161,7 @@
                                 <input type="hidden" name="num" value="1">
                                 <dd class="goods-info-head-cart" id="goodsDetailBtnBox">
                                     <button disabled="disabled" href="http://cart.mi.com/cart/add/2161600004" id="goodsDetailAddCartBtn" class="btn  btn-primary goods-add-cart-btn" data-disabled="false" data-gid="2161600004" data-package="0" data-stat-id="e7ed8543f67c5bd7" > <i class="iconfont"></i>加入购物车 </button>
-                                    <a id="goodsDetailCollectBtn" data-isfavorite="false" class=" btn btn-gray  goods-collect-btn " data-stat-id="9d1c11913f946c7f" > <i class="iconfont default"></i> <i class="iconfont red"></i><i class="iconfont red J_redCopy"></i>喜欢 </a>
+                                    <a id="goodsDetailCollectBtn" data-isfavorite="{{ $isCollected ? 'true' : 'false' }}" class=" btn btn-gray  goods-collect-btn {{ $isCollected ? 'current' : '' }} " data-stat-id="9d1c11913f946c7f" > <i class="iconfont default"></i> <i class="iconfont red"></i><i class="iconfont red J_redCopy"></i>喜欢 </a>
                                 </dd>
                                 <dd class="goods-info-head-userfaq">
                                     <ul>
@@ -342,6 +368,14 @@
         </div>
     </div>
 </div>
+<div class="add-cart-mask" id="addCartMask"></div>
+<div class="add_ok" id="cart_show">
+    <div class="tip"><i>✓</i>商品已成功加入购物车</div>
+    <div class="go">
+        <a href="javascript:void(0);" id="addCartContinue" class="back">&lt;&lt;继续购物</a>
+        <a href="/cart" class="btn">去结算</a>
+    </div>
+</div>
 </body>
 @endsection
 @section('js')
@@ -350,8 +384,7 @@
 <script src="/data/indexData.js"></script>
 
 <script src="/homes/common/myjs/common.js"></script>
-
-@show
+@endsection
 @section('LDjs')
 <script type="text/javascript">
     $('[name="attr"]').click(function () {
@@ -380,31 +413,33 @@
         return false;
     });
 
+    //同步顶栏购物车数量角标 + 加购成功弹窗 (替代原生 confirm)
+    function showAddOkDialog() {
+        $('#addCartMask').show();
+        $('#cart_show').show();
+    }
+    function closeAddOkDialog() {
+        $('#cart_show').hide();
+        $('#addCartMask').hide();
+    }
+    $('#addCartContinue').add('#addCartMask').on('click', closeAddOkDialog);
+
     $('#goodsDetailAddCartBtn').click(function () {
-
-        console.log($('#yourformid').serialize());
-//        return false;
         $.ajax({
-
             type: "get",
             dataType:'json',
-            url:"/cart/ajaxaddcart",
+            url:"/cart/ajax-add",
             data:$('#yourformid').serialize(),// 你的formid
-            async: false,
             error: function() {
                 alert("系统错误请稍后再试!");
             },
             success: function(data) {
-
                 if(data.status==0){
-                    var r=confirm("添加成功,去购物车结算");
-                    if (r==true)
-                    {
-                        window.location.href="/cart";
-                    }
-
+                    //顶栏购物车角标联动 + 样式化成功弹窗
+                    syncCartNum(data.count);
+                    showAddOkDialog();
                 }else{
-                    alert('您的商品被江洋大盗劫走了,我们会很快抓住他的,请您稍后再试!');
+                    alert(data.msg||'加入购物车失败, 请稍后再试!');
                 }
             }
         });
@@ -417,8 +452,7 @@
         $.ajax({
             type: "get",
             dataType: 'json',
-            url: "/collect",
-            data: {id: {{ $good->id }}},
+            url: "/collect/{{ $good->id }}",
             error: function() {
                 alert("系统错误请稍后再试!");
             },
@@ -431,8 +465,9 @@
                     return;
                 }
                 alert(data.info);
-                // 收藏成功点亮喜欢, 取消收藏还原
-                $($btn).toggleClass('current', data.status == 0);
+                // 收藏成功点亮红心, 取消收藏还原 (以接口返回的 collected 为准, 不能用 status==0 判断——
+                // 收藏和取消的 status 都是 0, 那样写会导致取消后红心仍然点亮)
+                $($btn).toggleClass('current', !!data.collected);
             }
         });
         return false;

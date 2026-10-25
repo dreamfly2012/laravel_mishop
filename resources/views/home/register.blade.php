@@ -7,6 +7,7 @@
     <meta name="Keywords" content="" />
     <meta name="Description" content="" />
     <title>小米官网</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <link href="/homes/common/css/login.css" rel="stylesheet" type="text/css" />
     <script type="text/javascript" src="/homes/common/js/common.js"></script>
@@ -168,7 +169,7 @@
     <div class="n-footer">
         <div class="nl-f-nav">
         </div>
-        <p class="nf-intro"><span>&copy;<a href="http://mm.com/user.php?act=register#">mi.com</a> 京ICP证110507号 京ICP备10046444号 京公网安备1101080212535号 <a href="http://mm.com/user.php?act=register#">京网文[2014]0059-0009号</a></span></p>
+        <p class="nf-intro"><span>&copy;<a href="/">mi.com</a> 京ICP证110507号 京ICP备10046444号 京公网安备1101080212535号 <a href="/">京网文[2014]0059-0009号</a></span></p>
     </div>
 </div>
 <script type="text/javascript">

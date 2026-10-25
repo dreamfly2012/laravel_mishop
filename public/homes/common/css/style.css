@@ -422,7 +422,7 @@ a:hover {
 	height: 36px;
 	text-indent: -9999em;
 	overflow: hidden;
-	background-image: url("http://c1.mifile.cn/f/i/2014/cn/icon/icon-star-large.png");
+	background-image: url("/cdn/c1.mifile.cn/f/i/2014/cn/icon/icon-star-large.png");
 	background-repeat: no-repeat;
 	cursor: pointer
 }
@@ -439,7 +439,7 @@ a:hover {
 	width: 65px;
 	height: 14px;
 	overflow: hidden;
-	background-image: url("http://c1.mifile.cn/f/i/2014/cn/icon/icon-stat.png");
+	background-image: url("/cdn/c1.mifile.cn/f/i/2014/cn/icon/icon-stat.png");
 	background-repeat: no-repeat
 }
 .icon-stat-5 {
@@ -489,7 +489,7 @@ a:hover {
 	height: 69px;
 	text-indent: -9999em;
 	overflow: hidden;
-	background-image: url("http://c1.mifile.cn/f/i/2014/cn/icon/icon-slides.png");
+	background-image: url("/cdn/c1.mifile.cn/f/i/2014/cn/icon/icon-slides.png");
 	background-repeat: no-repeat;
 	_filter: alpha(opacity=40)
 }

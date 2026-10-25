@@ -10,6 +10,7 @@ use DB;
 use App\Models\Cate;
 use App\Models\Good;
 use App\Models\Sku;
+use App\Models\Banner;
 class IndexController extends Controller
 {
     public function index()
@@ -22,10 +23,18 @@ class IndexController extends Controller
             $star = json_decode(file_get_contents($starFile));
         }
         $smarty = $this->allGoods(1);
-        // dd($smarty);
+
+        // 首页展示位: 轮播图 / 焦点图下方促销小图 / 频道入口
+        $carousel = Banner::where('position','carousel')->where('status',1)->orderBy('sort')->orderBy('id')->get();
+        $promo    = Banner::where('position','promo')->where('status',1)->orderBy('sort')->orderBy('id')->get();
+        $channel  = Banner::where('position','channel')->where('status',1)->orderBy('sort')->orderBy('id')->get();
+
         return view('home.index',[
             'star'=>$star,
             'smarty'=>$smarty,
+            'carousel'=>$carousel,
+            'promo'=>$promo,
+            'channel'=>$channel,
         ]);
     }
 

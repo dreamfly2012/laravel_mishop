@@ -5,11 +5,11 @@ namespace App\Http\Controllers\Admin;
 
 use App\Models\Cate;
 use App\Models\Good;
+use App\Support\ImageUpload;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Input;
 
 class GoodsController extends Controller
 {
@@ -28,12 +28,6 @@ class GoodsController extends Controller
     public function postInsert(Request $request)
     {
 
-//        dd($_FILES['img']);
-//        $imgs = Input::file('img');
-//        dd($imgs[0]);
-//        dd($request->file('showImg'));
-//        dd($request->file('img'));
-//        dd($request->all());
         $good = new Good();
         $data = $request->all();
         $good->title = $data['title'];
@@ -56,35 +50,20 @@ class GoodsController extends Controller
 
 
         if($good->save()){
-            return redirect('admin/sku/add?id='.$good->id)->with('info','添加成功');
+            return redirect('/admin/sku/add/'.$good->id)->with('info','添加成功');
         }else{
             return back()->with('error','添加失败');
         }
     }
 
-        private function uploadFile(Request $request, string $field): string
+    private function uploadFile(Request $request, string $field): string
     {
-        $file = $request->file($field);
-        $dir = config('app.upload_image_dir');
-        $name = $dir . rand(1000000, 9000000) . time() . '.' . strtolower($file->getClientOriginalExtension());
-        $file->move(public_path($dir), basename($name));
-        return $name;
+        return ImageUpload::store($request, $field);
     }
 
-        private function uploadFiles(Request $request): string
+    private function uploadFiles(Request $request): string
     {
-        $names = '';
-        $i = 0;
-        foreach ((array) $request->file('img') as $file) {
-            if (!$file || !$file->isValid()) {
-                continue;
-            }
-            $dir = config('app.upload_image_dir');
-            $name = $dir . rand(1000000, 9000000) . time() . ($i++) . '.' . strtolower($file->getClientOriginalExtension());
-            $file->move(public_path($dir), basename($name));
-            $names .= $name . ',';
-        }
-        return $names;
+        return ImageUpload::storeMany($request, 'img');
     }
 
 
@@ -92,7 +71,7 @@ class GoodsController extends Controller
 
     public function getEdit(Request $request)
     {
-        $good = Good::where('id',$request->only('id'))->first();
+        $good = Good::where('id', $request->route('id'))->first();
         $cates = Cate::where('pid','0')->get();
         return view('admin.goods.update',['good'=>$good,'cates'=>$cates,'title'=>'修改详情']);
     }
@@ -100,7 +79,10 @@ class GoodsController extends Controller
     public function postUpdate(Request $request)
     {
         $data = $request->all();
-        $good = Good::where('id',$request->only('id'))->first();
+        $good = Good::where('id',$request->input('id'))->first();
+        if (!$good) {
+            return back()->with('error','商品不存在');
+        }
 
         //判断用户名
         if($good['title'] != $request->input('title')) {
@@ -125,11 +107,13 @@ class GoodsController extends Controller
 
         if($request->file('img'))
         {
-            $pics = Good::select('img')->where('id',$data['id'])->get();
-            foreach (explode(',',$pics[0]->img) as $value)
-            {
-                if(file_exists($value)){
-                    unlink($value);
+            $pics = Good::select('img')->where('id',$data['id'])->first();
+            if ($pics && $pics->img) {
+                foreach (explode(',',$pics->img) as $value)
+                {
+                    if ($value !== '' && is_file(public_path($value))) {
+                        @unlink(public_path($value));
+                    }
                 }
             }
             $good->img = $this->uploadFiles($request);
@@ -146,7 +130,16 @@ class GoodsController extends Controller
         if (!$img || $img == $dir . $default) {
             return;
         }
+        // 仅允许删除上传目录内的文件, 防止库内路径被篡改后路径穿越删除项目其他文件
+        if (!str_starts_with($img, $dir)) {
+            return;
+        }
         $full = public_path($img);
+        $base = rtrim(public_path($dir), '/');
+        $real = realpath($full);
+        if ($real === false || strncmp($real, $base . '/', strlen($base) + 1) !== 0) {
+            return;
+        }
         if (is_file($full)) {
             @unlink($full);
         }
@@ -155,9 +148,12 @@ class GoodsController extends Controller
 
     public function getDelete(Request $request)
     {
-        $id = $request->input('id');
-
-        if(Good::where('id',$id)->first()->delete()){
+        $id = $request->route('id');
+        $good = Good::find($id);
+        if (!$good) {
+            return back()->with('error','商品不存在!');
+        }
+        if($good->delete()){
             return back()->with('info','删除成功!');
         }else{
             return back()->with('error','删除失败!');

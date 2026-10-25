@@ -30,8 +30,8 @@
                         <td>{{$comment['status']}}</td>
                         <td>
                             <span class="btn-group">
-                                <a href="/admin/comment/edit?id={{$comment['id']}}" class="btn btn-small"><i class="icon-pencil"></i></a>
-                                <a href="/admin/comment/delete?id={{$comment['id']}}" class="btn btn-small"><i class="icon-trash"></i></a>
+                                <a href="/admin/comment/edit/{{$comment['id']}}" class="btn btn-small"><i class="icon-pencil"></i></a>
+                                <a href="/admin/comment/delete/{{$comment['id']}}" class="btn btn-small"><i class="icon-trash"></i></a>
                             </span>
                         </td>
 
