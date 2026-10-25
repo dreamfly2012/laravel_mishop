@@ -40,7 +40,7 @@
 | 模块 | 说明 |
 | --- | --- |
 | 首页 | 轮播、侧边分类导航、明星单品；导航与明星单品数据来自 `public/data/*.json` |
-| 分类 / 搜索 | `/list/{id}` 分类列表、`/list-search?kWord=xx` 关键词搜索 |
+| 分类 / 搜索 | `/list/{id}` 分类列表、`/list-search?kWord=xx` 关键词搜索（Laravel Scout；默认数据库模糊匹配，可选接入 Meilisearch 获得拼写容错，见[常见问题](#常见问题)） |
 | 商品详情 | 商品图集、规格参数、SKU 切换（价格 / 库存联动）、用户评价 |
 | 注册 / 登录 | 用户名密码登录，注册、找回密码，图形验证码（`gregwar/captcha`） |
 | 购物车 | 未登录存 Session，登录后存 `carts` 表；支持数量增减、单选 / 全选、实时小计 |
@@ -199,6 +199,24 @@ CSRF Token 失效。表单需包含 `{{ csrf_field() }}`，AJAX 请求需带 `X-
 
 **首页导航或明星单品不更新？**
 后台修改后执行 `php database/regen_navdata.php`，或检查 `public/data/` 目录写权限。
+
+**想让搜索支持拼写容错（如 "小米5" 能搜到 "小米 5"）？**
+默认使用数据库 `LIKE` 模糊匹配，无需任何外部服务。可选接入 Meilisearch：
+
+```bash
+# 1. 启动 Meilisearch（master key 需与 .env 中 MEILISEARCH_KEY 一致）
+docker run -d --name meili -p 7700:7700 -e MEILI_MASTER_KEY=masterKey getmeili/meilisearch:v1.16
+
+# 2. .env 中配置
+#    SCOUT_DRIVER=meilisearch
+#    MEILISEARCH_HOST=http://127.0.0.1:7700
+#    MEILISEARCH_KEY=masterKey
+
+# 3. 导入索引
+php artisan scout:import "App\\Models\\Good"
+```
+
+不启动 Meilisearch 时搜索自动回落到数据库匹配，demo 开箱即用；更多细节见 `AGENTS.md` 的「搜索」章节。
 
 ---
 
